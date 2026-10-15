@@ -30,6 +30,9 @@
 //	    APIKey: "your-api-key",
 //	    APIUrl: "https://your-instance.daytona.io/api",
 //	})
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
 //	v1 := client.V1()
 //
 // # Creating Sandboxes
