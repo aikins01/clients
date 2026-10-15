@@ -313,7 +313,7 @@ for _, snap := range result.Items {
 // secrets — cursor pagination
 query := &types.ListSecretsQuery{}
 for {
-page, err := client.V1().Secret.List(ctx, query)
+    page, err := client.V1().Secret.List(ctx, query)
     if err != nil {
         log.Fatal(err)
     }

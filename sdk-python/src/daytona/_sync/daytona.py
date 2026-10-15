@@ -89,10 +89,9 @@ class Daytona:
         config = DaytonaConfig(
             api_key="your-api-key",
             api_url="https://your-api.com",
-            target="us"
         )
         daytona = Daytona(config)
-        sandbox = daytona.create()
+        sandbox = daytona.create(CreateSandboxFromSnapshotParams(target="us"))
         ```
 
         Using OpenTelemetry tracing:
@@ -142,7 +141,6 @@ class Daytona:
             config = DaytonaConfig(
                 api_key="your-api-key",
                 api_url="https://your-api.com",
-                target="us"
             )
             daytona2 = Daytona(config)
 

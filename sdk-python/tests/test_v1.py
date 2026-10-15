@@ -172,6 +172,19 @@ class TestRootDaytonaWrapper:
         assert caught == []
         v1_client.create.assert_called_once_with()
 
+    def test_real_v1_client_members_do_not_warn(self, monkeypatch):
+        monkeypatch.delenv("DAYTONA_TARGET", raising=False)
+        client = _make_root_daytona(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            v1 = client.v1
+            v1.default_language = CodeLanguage.TYPESCRIPT
+            assert v1.default_language == CodeLanguage.TYPESCRIPT
+            _ = (v1.volume, v1.snapshot, v1.secret, v1.warm_pool)
+
+        assert [warning for warning in caught if issubclass(warning.category, DeprecationWarning)] == []
+
     def test_root_wrapper_has_v1_parity_with_sync_client(self, monkeypatch):
         monkeypatch.delenv("DAYTONA_TARGET", raising=False)
 

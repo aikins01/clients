@@ -134,11 +134,10 @@ class AsyncDaytona:
         config = DaytonaConfig(
             api_key="your-api-key",
             api_url="https://your-api.com",
-            target="us"
         )
         try:
             daytona = AsyncDaytona(config)
-            sandbox = await daytona.create()
+            sandbox = await daytona.create(CreateSandboxFromSnapshotParams(target="us"))
         finally:
             await daytona.close()
         ```
@@ -190,7 +189,6 @@ class AsyncDaytona:
             config = DaytonaConfig(
                 api_key="your-api-key",
                 api_url="https://your-api.com",
-                target="us"
             )
             daytona2 = AsyncDaytona(config)
             await daytona2.close()
