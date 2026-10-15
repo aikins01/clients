@@ -22,6 +22,7 @@ if TYPE_CHECKING:
     from daytona_api_client_async import GpuType, SandboxClass
     from daytona_toolbox_api_client import SessionExecuteResponse
 
+    from . import v1 as v1
     from ._async.computer_use import AsyncComputerUse, AsyncDisplay, AsyncKeyboard, AsyncMouse, AsyncScreenshot
     from ._async.sandbox import AsyncSandbox
     from ._root import AsyncDaytona, Daytona

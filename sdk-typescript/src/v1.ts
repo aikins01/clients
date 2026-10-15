@@ -9,6 +9,12 @@ export { Daytona, V1_API_URL } from './Daytona'
 export { Daytona as DaytonaV1 } from './Daytona'
 export { Image, Image as ImageV1 } from './Image'
 export { Sandbox, Sandbox as SandboxV1 } from './Sandbox'
+export type {
+  DaytonaConfig as DaytonaConfigV1,
+  Resources as ResourcesV1,
+  VolumeMount as VolumeMountV1,
+} from './Daytona'
+export type { ListSandboxesQuery as ListSandboxesQueryV1 } from './Sandbox'
 export {
   DaytonaAuthenticationError,
   DaytonaAuthenticationError as DaytonaAuthenticationErrorV1,

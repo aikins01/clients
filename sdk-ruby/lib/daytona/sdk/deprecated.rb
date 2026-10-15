@@ -14,10 +14,6 @@ module Daytona
     # @deprecated Use {BadRequestError} instead. Kept as an alias so existing
     #   `rescue Daytona::Sdk::ValidationError` blocks keep working.
     ValidationError = BadRequestError
-
-    # @deprecated Use {ForbiddenError} instead. Kept as an alias so existing
-    #   `rescue Daytona::Sdk::AuthorizationError` blocks keep working.
-    AuthorizationError = ForbiddenError
   end
 
   Error = Sdk::Error

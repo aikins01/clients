@@ -3,8 +3,13 @@
 
 from __future__ import annotations
 
+import inspect
+import os
+import subprocess
+import sys
 import warnings
 from collections.abc import Iterator
+from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -293,6 +298,22 @@ class TestRootAsyncDaytonaWrapper:
         assert missing_members == []
 
 
+@pytest.mark.parametrize(
+    ("root_cls", "impl_cls"), [(daytona.Daytona, DaytonaImpl), (daytona.AsyncDaytona, AsyncDaytonaImpl)]
+)
+def test_root_forwarders_match_v1_method_signatures(root_cls: type, impl_cls: type):
+    def shape(func: object) -> list[tuple[str, object, object]]:
+        signature = inspect.signature(func)  # pyright: ignore[reportArgumentType]
+        return [(param.name, param.kind, param.default) for param in signature.parameters.values()]
+
+    mismatched = [
+        name
+        for name, member in inspect.getmembers(impl_cls, inspect.isfunction)
+        if not name.startswith("_") and shape(member) != shape(getattr(root_cls, name))
+    ]
+    assert mismatched == []
+
+
 class TestTargetDeprecation:
     def test_target_config_warns_once_per_process(self):
         with warnings.catch_warnings(record=True) as caught:
@@ -397,6 +418,38 @@ class TestV1NamespaceExports:
 
         for alias_name, target in alias_pairs.items():
             assert getattr(daytona_v1, alias_name) is target
+
+    def test_v1_all_is_root_all_plus_aliases(self):
+        aliases = [name for name in daytona_v1.__all__ if name not in daytona.__all__]
+        assert daytona_v1.__all__ == [*daytona.__all__, *aliases]
+        assert all(name.endswith("V1") for name in aliases)
+        for name in daytona_v1.__all__:
+            assert getattr(daytona_v1, name) is not None
+
+    def test_v1_namespace_type_checks_as_an_installed_library(self, tmp_path):
+        # Run the type checker on a consumer file with the package on the search path rather than
+        # as local source, which is how installed users see daytona.v1.
+        consumer = tmp_path / "consumer.py"
+        consumer.write_text(
+            "import daytona\n"
+            "from daytona.v1 import AsyncDaytona, Daytona, SandboxV1\n"
+            "from daytona._sync.daytona import Daytona as Impl\n"
+            "def use(client: Daytona) -> None:\n    print(client)\n"
+            "use(daytona.Daytona().v1)\n"
+            "impl: type[Impl] = daytona.v1.Daytona\n"
+            "async_impl = AsyncDaytona\n"
+            "sandbox_type = SandboxV1\n"
+        )
+        src_dir = Path(daytona.__file__).resolve().parent.parent
+        result = subprocess.run(
+            [sys.executable, "-m", "basedpyright", "--pythonpath", sys.executable, str(consumer)],
+            capture_output=True,
+            text=True,
+            check=False,
+            cwd=tmp_path,
+            env={**os.environ, "PYTHONPATH": str(src_dir)},
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
 
     def test_v1_api_url_is_exported(self):
         assert V1_API_URL == "https://app.daytona.io/api"

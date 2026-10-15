@@ -3,6 +3,17 @@
 
 import * as fs from 'fs'
 import * as path from 'path'
+import type { DaytonaConfig, ListSandboxesQuery, Resources, VolumeMount } from '../index'
+import type { DaytonaConfigV1, ListSandboxesQueryV1, ResourcesV1, VolumeMountV1 } from '../v1'
+
+// Type-level: the V1 type aliases are the same types as the root ones (fails to compile otherwise).
+type Same<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false
+const typeAliasesMatch: [
+  Same<DaytonaConfigV1, DaytonaConfig>,
+  Same<ListSandboxesQueryV1, ListSandboxesQuery>,
+  Same<ResourcesV1, Resources>,
+  Same<VolumeMountV1, VolumeMount>,
+] = [true, true, true, true]
 
 const createMock = jest.fn(async () => 'created')
 const getMock = jest.fn(async (sandboxId: string) => sandboxId)
@@ -86,6 +97,7 @@ describe('@daytona/sdk/v1 namespace', () => {
     expect(v1.DaytonaV1).toBe(ImplementationDaytona)
     expect(v1.ImageV1).toBe(v1.Image)
     expect(v1.SandboxV1).toBe(v1.Sandbox)
+    expect(typeAliasesMatch).toEqual([true, true, true, true])
     expect(root.V1_API_URL).toBe(V1_API_URL)
     expect(v1.V1_API_URL).toBe(V1_API_URL)
 
