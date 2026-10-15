@@ -85,9 +85,9 @@ Pass `target:` in the sandbox create params, or `region_id:` in the snapshot cre
 require 'daytona'
 
 daytona = Daytona::Daytona.new.v1
-sandbox = daytona.create(Daytona::CreateSandboxFromSnapshotParams.new(target: 'eu'))
+sandbox = daytona.create(Daytona::V1::CreateSandboxFromSnapshotParams.new(target: 'eu'))
 snapshot = daytona.snapshot.create(
-  Daytona::CreateSnapshotParams.new(name: 'my-snapshot', image: 'python:3.12', region_id: 'eu')
+  Daytona::V1::CreateSnapshotParams.new(name: 'my-snapshot', image: 'python:3.12', region_id: 'eu')
 )
 ```
 
@@ -100,9 +100,9 @@ require 'daytona'
 
 daytona = Daytona::Daytona.new.v1
 sandbox = daytona.create(
-    Daytona::CreateSandboxFromImageParams.new(
-        image: Daytona::Image.debian_slim('3.12'),
-        resources: Daytona::Resources.new(cpu: 2, memory: 4, disk: 8)
+    Daytona::V1::CreateSandboxFromImageParams.new(
+        image: Daytona::V1::Image.debian_slim('3.12'),
+        resources: Daytona::V1::Resources.new(cpu: 2, memory: 4, disk: 8)
     )
 )
 ```
@@ -116,7 +116,7 @@ require 'daytona'
 
 daytona = Daytona::Daytona.new.v1
 sandbox = daytona.create(
-    Daytona::CreateSandboxFromSnapshotParams.new(ephemeral: true, auto_stop_interval: 5)
+    Daytona::V1::CreateSandboxFromSnapshotParams.new(ephemeral: true, auto_stop_interval: 5)
 )
 ```
 
@@ -129,7 +129,7 @@ require 'daytona'
 
 daytona = Daytona::Daytona.new.v1
 sandbox = daytona.create(
-    Daytona::CreateSandboxFromSnapshotParams.new(
+    Daytona::V1::CreateSandboxFromSnapshotParams.new(
         snapshot: 'my-snapshot-name'
     )
 )
@@ -202,7 +202,7 @@ Create and start a language server to get code completions, document symbols, an
 ```ruby
 # Create a language server
 lsp_server = sandbox.create_lsp_server(
-  language_id: Daytona::LspServer::Language::PYTHON,
+  language_id: Daytona::V1::LspServer::Language::PYTHON,
   path_to_project: 'workspace/project'
 )
 lsp_server.start
@@ -216,7 +216,7 @@ symbols = lsp_server.document_symbols('workspace/project/main.py')
 # Get completions
 completions = lsp_server.completions(
   path: 'workspace/project/main.py',
-  position: Daytona::LspServer::Position.new(line: 10, character: 15)
+  position: Daytona::V1::LspServer::Position.new(line: 10, character: 15)
 )
 ```
 
@@ -226,17 +226,17 @@ Each `list` method returns a different shape depending on the resource. The tabl
 
 | Method | Return type | Shape | Access elements |
 | --- | --- | --- | --- |
-| `daytona.snapshot.list(page:, limit:)` | `Daytona::PaginatedResource` | Paginated wrapper | `result.items.each` |
-| `daytona.secret.list(cursor:, limit:, ...)` | `Daytona::ListSecretsResponse` | Cursor-paginated wrapper | `page.items.each` |
-| `daytona.volume.list` | `Array<Daytona::Volume>` | Bare array | iterate directly |
-| `daytona.list(query)` | `Enumerator<Daytona::Sandbox>` | Lazy enumerator | `.each { \|s\| ... }` |
+| `daytona.snapshot.list(page:, limit:)` | `Daytona::V1::PaginatedResource` | Paginated wrapper | `result.items.each` |
+| `daytona.secret.list(cursor:, limit:, ...)` | `Daytona::V1::ListSecretsResponse` | Cursor-paginated wrapper | `page.items.each` |
+| `daytona.volume.list` | `Array<Daytona::V1::Volume>` | Bare array | iterate directly |
+| `daytona.list(query)` | `Enumerator<Daytona::V1::Sandbox>` | Lazy enumerator | `.each { \|s\| ... }` |
 
 `PaginatedResource` and `ListSecretsResponse` are **wrapper objects**, not arrays. Calling `.each` or `.map` directly on them raises `NoMethodError`. Always go through `.items`:
 
 ```ruby
 # snapshots — page-number pagination
 result = daytona.snapshot.list(page: 1, limit: 20)
-# result.items       => Array<Daytona::Snapshot>
+# result.items       => Array<Daytona::V1::Snapshot>
 # result.total       => Float (total across all pages)
 # result.page        => Float (current page, 1-indexed)
 # result.total_pages => Float
@@ -246,7 +246,7 @@ result.items.each { |snapshot| puts "#{snapshot.name} (#{snapshot.image_name})" 
 cursor = nil
 loop do
   page = daytona.secret.list(cursor: cursor, limit: 100)
-  # page.items       => Array<Daytona::Secret>
+  # page.items       => Array<Daytona::V1::Secret>
   # page.total       => Float
   # page.next_cursor => String | nil (nil = no more pages)
   page.items.each { |secret| puts secret.name }
@@ -258,6 +258,6 @@ end
 daytona.volume.list.each { |vol| puts vol.name }
 
 # sandboxes — lazy enumerator, fetches pages on demand
-query = Daytona::ListSandboxesQuery.new(labels: { 'env' => 'dev' })
+query = Daytona::V1::ListSandboxesQuery.new(labels: { 'env' => 'dev' })
 daytona.list(query).each { |sandbox| puts sandbox.id }
 ```

@@ -100,7 +100,9 @@ Call `daytona.SetDeprecationWarningWriter(io.Discard)` to silence the runtime wa
 ### Create a sandbox or snapshot in a specific region
 
 Set `Target` on the sandbox create params, or `RegionID` on `types.CreateSnapshotParams`, to choose the
-[region](https://www.daytona.io/docs/en/regions/) for that call.
+[region](https://www.daytona.io/docs/en/regions/) for that call. The region is resolved per call: the per-call
+value, then the deprecated `DaytonaConfig.Target` (or `DAYTONA_TARGET`, which prints a one-time deprecation
+warning), then the organization's default region.
 
 ```go
 sandbox, err := client.V1().Create(ctx, types.SnapshotParams{

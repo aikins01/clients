@@ -79,7 +79,7 @@ Daytona provides [examples](https://www.daytona.io/docs/en/getting-started/#exam
 
 ### Create a sandbox or snapshot in a specific region
 
-Pass `target` in the sandbox create params, or `regionId` in the snapshot create params, to choose the [region](https://www.daytona.io/docs/en/regions/) for that call. The region is resolved per call: the per-call value, then the client-level `target` (or `DAYTONA_TARGET`), then the organization's default region.
+Pass `target` in the sandbox create params, or `regionId` in the snapshot create params, to choose the [region](https://www.daytona.io/docs/en/regions/) for that call. The region is resolved per call: the per-call value, then the deprecated client-level `target` (or `DAYTONA_TARGET`, which emits a one-time deprecation warning), then the organization's default region.
 
 ```typescript
 import { Daytona } from '@daytona/sdk'
