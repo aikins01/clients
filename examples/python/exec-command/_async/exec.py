@@ -12,7 +12,8 @@ from daytona import (
 
 
 async def main():
-    async with AsyncDaytona() as daytona:
+    async with AsyncDaytona() as daytona_root:
+        daytona = daytona_root.v1
         params = CreateSandboxFromImageParams(
             image="python:3.9.23-slim",
             language="python",

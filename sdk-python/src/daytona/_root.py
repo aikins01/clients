@@ -1,0 +1,281 @@
+# Copyright Daytona Platforms Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+# pylint: disable=protected-access
+
+from __future__ import annotations
+
+from collections.abc import AsyncIterator, Iterator
+from types import TracebackType
+from typing import Callable, overload
+
+from typing_extensions import deprecated
+
+from ._async.daytona import AsyncDaytona as _AsyncDaytonaV1
+from ._async.sandbox import AsyncSandbox
+from ._async.secret import AsyncSecretService
+from ._async.snapshot import AsyncSnapshotService
+from ._async.volume import AsyncVolumeService
+from ._async.warm_pool import AsyncWarmPoolService
+from ._sync.daytona import Daytona as _DaytonaV1
+from ._sync.sandbox import Sandbox
+from ._sync.secret import SecretService
+from ._sync.snapshot import SnapshotService
+from ._sync.volume import VolumeService
+from ._sync.warm_pool import WarmPoolService
+from ._versioning import warn_root_namespace_once
+from .common.daytona import CodeLanguage, CreateSandboxFromImageParams, CreateSandboxFromSnapshotParams, DaytonaConfig
+from .common.sandbox import ListSandboxesQuery
+
+
+def _close_sync_v1(client: _DaytonaV1) -> None:
+    if client._tracer_provider is not None:
+        client._tracer_provider.shutdown()
+    client._http_client.close()
+    client._api_client.rest_client.pool_manager.clear()
+    client._toolbox_api_client.rest_client.pool_manager.clear()
+    client._subscription_manager.shutdown()
+    if client._event_dispatcher is not None:
+        client._event_dispatcher.disconnect()
+
+
+class Daytona:
+    _v1: _DaytonaV1
+
+    def __init__(self, config: DaytonaConfig | None = None):
+        self._v1 = _DaytonaV1(config)
+
+    @property
+    def v1(self) -> _DaytonaV1:
+        return self._v1
+
+    def __enter__(self) -> "Daytona":
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None = None,
+        exc_value: BaseException | None = None,
+        traceback: TracebackType | None = None,
+    ) -> None:
+        self.close()
+
+    def close(self) -> None:
+        _close_sync_v1(self.v1)
+
+    @property
+    @deprecated("Use `daytona.v1.default_language` instead. The root form is removed in SDK 2.x.", category=None)
+    def default_language(self) -> CodeLanguage:
+        warn_root_namespace_once("default_language")
+        return self.v1.default_language
+
+    @default_language.setter
+    @deprecated("Use `daytona.v1.default_language` instead. The root form is removed in SDK 2.x.", category=None)
+    def default_language(self, value: CodeLanguage) -> None:
+        warn_root_namespace_once("default_language")
+        self.v1.default_language = value
+
+    @property
+    @deprecated("Use `daytona.v1.volume` instead. The root form is removed in SDK 2.x.", category=None)
+    def volume(self) -> VolumeService:
+        warn_root_namespace_once("volume")
+        return self.v1.volume
+
+    @property
+    @deprecated("Use `daytona.v1.snapshot` instead. The root form is removed in SDK 2.x.", category=None)
+    def snapshot(self) -> SnapshotService:
+        warn_root_namespace_once("snapshot")
+        return self.v1.snapshot
+
+    @property
+    @deprecated("Use `daytona.v1.secret` instead. The root form is removed in SDK 2.x.", category=None)
+    def secret(self) -> SecretService:
+        warn_root_namespace_once("secret")
+        return self.v1.secret
+
+    @property
+    @deprecated("Use `daytona.v1.warm_pool` instead. The root form is removed in SDK 2.x.", category=None)
+    def warm_pool(self) -> WarmPoolService:
+        warn_root_namespace_once("warm_pool")
+        return self.v1.warm_pool
+
+    @overload
+    @deprecated("Use `daytona.v1.create` instead. The root form is removed in SDK 2.x.", category=None)
+    def create(
+        self,
+        params: CreateSandboxFromSnapshotParams | None = None,
+        *,
+        timeout: float = 60,
+    ) -> Sandbox: ...
+
+    @overload
+    @deprecated("Use `daytona.v1.create` instead. The root form is removed in SDK 2.x.", category=None)
+    def create(
+        self,
+        params: CreateSandboxFromImageParams | None = None,
+        *,
+        timeout: float = 60,
+        on_snapshot_create_logs: Callable[[str], None] | None = None,
+    ) -> Sandbox: ...
+
+    @deprecated("Use `daytona.v1.create` instead. The root form is removed in SDK 2.x.", category=None)
+    def create(
+        self,
+        params: CreateSandboxFromSnapshotParams | CreateSandboxFromImageParams | None = None,
+        *,
+        timeout: float = 60,
+        on_snapshot_create_logs: Callable[[str], None] | None = None,
+    ) -> Sandbox:
+        warn_root_namespace_once("create")
+        create = getattr(self.v1, "create")
+        return create(params, timeout=timeout, on_snapshot_create_logs=on_snapshot_create_logs)
+
+    @deprecated("Use `daytona.v1.delete` instead. The root form is removed in SDK 2.x.", category=None)
+    def delete(self, sandbox: Sandbox, timeout: float = 60, wait: bool = False) -> None:
+        warn_root_namespace_once("delete")
+        self.v1.delete(sandbox, timeout, wait=wait)
+
+    @deprecated("Use `daytona.v1.get` instead. The root form is removed in SDK 2.x.", category=None)
+    def get(self, sandbox_id_or_name: str, request_timeout: float | None = None) -> Sandbox:
+        warn_root_namespace_once("get")
+        return self.v1.get(sandbox_id_or_name, request_timeout=request_timeout)
+
+    @deprecated("Use `daytona.v1.list` instead. The root form is removed in SDK 2.x.", category=None)
+    def list(
+        self,
+        query: ListSandboxesQuery | None = None,
+        request_timeout: float | None = None,
+    ) -> Iterator[Sandbox]:
+        warn_root_namespace_once("list")
+        return self.v1.list(query, request_timeout=request_timeout)
+
+    @deprecated("Use `daytona.v1.start` instead. The root form is removed in SDK 2.x.", category=None)
+    def start(self, sandbox: Sandbox, timeout: float = 60) -> None:
+        warn_root_namespace_once("start")
+        self.v1.start(sandbox, timeout)
+
+    @deprecated("Use `daytona.v1.stop` instead. The root form is removed in SDK 2.x.", category=None)
+    def stop(self, sandbox: Sandbox, timeout: float = 60) -> None:
+        warn_root_namespace_once("stop")
+        self.v1.stop(sandbox, timeout)
+
+
+class AsyncDaytona:
+    _v1: _AsyncDaytonaV1
+
+    def __init__(self, config: DaytonaConfig | None = None):
+        self._v1 = _AsyncDaytonaV1(config)
+
+    @property
+    def v1(self) -> _AsyncDaytonaV1:
+        return self._v1
+
+    async def __aenter__(self) -> "AsyncDaytona":
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: type[BaseException] | None = None,
+        exc_value: BaseException | None = None,
+        traceback: TracebackType | None = None,
+    ) -> None:
+        await self.close()
+
+    async def close(self) -> None:
+        await self.v1.close()
+
+    @property
+    @deprecated("Use `daytona.v1.default_language` instead. The root form is removed in SDK 2.x.", category=None)
+    def default_language(self) -> CodeLanguage:
+        warn_root_namespace_once("default_language")
+        return self.v1.default_language
+
+    @default_language.setter
+    @deprecated("Use `daytona.v1.default_language` instead. The root form is removed in SDK 2.x.", category=None)
+    def default_language(self, value: CodeLanguage) -> None:
+        warn_root_namespace_once("default_language")
+        self.v1.default_language = value
+
+    @property
+    @deprecated("Use `daytona.v1.volume` instead. The root form is removed in SDK 2.x.", category=None)
+    def volume(self) -> AsyncVolumeService:
+        warn_root_namespace_once("volume")
+        return self.v1.volume
+
+    @property
+    @deprecated("Use `daytona.v1.snapshot` instead. The root form is removed in SDK 2.x.", category=None)
+    def snapshot(self) -> AsyncSnapshotService:
+        warn_root_namespace_once("snapshot")
+        return self.v1.snapshot
+
+    @property
+    @deprecated("Use `daytona.v1.secret` instead. The root form is removed in SDK 2.x.", category=None)
+    def secret(self) -> AsyncSecretService:
+        warn_root_namespace_once("secret")
+        return self.v1.secret
+
+    @property
+    @deprecated("Use `daytona.v1.warm_pool` instead. The root form is removed in SDK 2.x.", category=None)
+    def warm_pool(self) -> AsyncWarmPoolService:
+        warn_root_namespace_once("warm_pool")
+        return self.v1.warm_pool
+
+    @overload
+    @deprecated("Use `daytona.v1.create` instead. The root form is removed in SDK 2.x.", category=None)
+    async def create(
+        self,
+        params: CreateSandboxFromSnapshotParams | None = None,
+        *,
+        timeout: float = 60,
+    ) -> AsyncSandbox: ...
+
+    @overload
+    @deprecated("Use `daytona.v1.create` instead. The root form is removed in SDK 2.x.", category=None)
+    async def create(
+        self,
+        params: CreateSandboxFromImageParams | None = None,
+        *,
+        timeout: float = 60,
+        on_snapshot_create_logs: Callable[[str], None] | None = None,
+    ) -> AsyncSandbox: ...
+
+    @deprecated("Use `daytona.v1.create` instead. The root form is removed in SDK 2.x.", category=None)
+    async def create(
+        self,
+        params: CreateSandboxFromSnapshotParams | CreateSandboxFromImageParams | None = None,
+        *,
+        timeout: float = 60,
+        on_snapshot_create_logs: Callable[[str], None] | None = None,
+    ) -> AsyncSandbox:
+        warn_root_namespace_once("create")
+        create = getattr(self.v1, "create")
+        return await create(params, timeout=timeout, on_snapshot_create_logs=on_snapshot_create_logs)
+
+    @deprecated("Use `daytona.v1.delete` instead. The root form is removed in SDK 2.x.", category=None)
+    async def delete(self, sandbox: AsyncSandbox, timeout: float = 60, wait: bool = False) -> None:
+        warn_root_namespace_once("delete")
+        await self.v1.delete(sandbox, timeout, wait=wait)
+
+    @deprecated("Use `daytona.v1.get` instead. The root form is removed in SDK 2.x.", category=None)
+    async def get(self, sandbox_id_or_name: str, request_timeout: float | None = None) -> AsyncSandbox:
+        warn_root_namespace_once("get")
+        return await self.v1.get(sandbox_id_or_name, request_timeout=request_timeout)
+
+    @deprecated("Use `daytona.v1.list` instead. The root form is removed in SDK 2.x.", category=None)
+    def list(
+        self,
+        query: ListSandboxesQuery | None = None,
+        request_timeout: float | None = None,
+    ) -> AsyncIterator[AsyncSandbox]:
+        warn_root_namespace_once("list")
+        return self.v1.list(query, request_timeout=request_timeout)
+
+    @deprecated("Use `daytona.v1.start` instead. The root form is removed in SDK 2.x.", category=None)
+    async def start(self, sandbox: AsyncSandbox, timeout: float = 60) -> None:
+        warn_root_namespace_once("start")
+        await self.v1.start(sandbox, timeout)
+
+    @deprecated("Use `daytona.v1.stop` instead. The root form is removed in SDK 2.x.", category=None)
+    async def stop(self, sandbox: AsyncSandbox, timeout: float = 60) -> None:
+        warn_root_namespace_once("stop")
+        await self.v1.stop(sandbox, timeout)

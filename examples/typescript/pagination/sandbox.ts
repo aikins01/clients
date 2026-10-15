@@ -3,7 +3,7 @@ import { Daytona, SandboxListSortDirection, SandboxListSortField, SandboxState }
 async function main() {
   const daytona = new Daytona()
 
-  for await (const sandbox of daytona.list({
+  for await (const sandbox of daytona.v1.list({
     limit: 10,
     labels: { env: 'dev' },
     states: [SandboxState.STARTED],

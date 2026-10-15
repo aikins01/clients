@@ -57,6 +57,23 @@ RSpec.describe Daytona::Config do
       expect(config.organization_id).to eq('org-env')
     end
 
+    it 'warns once when target is configured directly or through DAYTONA_TARGET', :deprecation_warning do
+      ENV['DAYTONA_TARGET'] = 'eu'
+
+      original = $stderr
+      $stderr = StringIO.new
+      begin
+        described_class.new(target: 'us', api_key: 'k')
+        described_class.new(api_key: 'k')
+        stderr = $stderr.string
+      ensure
+        $stderr = original
+      end
+
+      expect(stderr.scan('DAYTONA_TARGET) is deprecated').size).to eq(1)
+      expect(stderr).to match(/region_id:/)
+    end
+
     it 'prefers explicit params over ENV' do
       ENV['DAYTONA_API_KEY'] = 'env-key'
 

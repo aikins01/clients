@@ -38,6 +38,7 @@ import { getPackageInfo, dynamicRequire } from './utils/Import'
 import { EventDispatcher } from './utils/EventDispatcher'
 import { EventSubscriptionManager } from './utils/EventSubscriptionManager'
 import { withConnectionRetry } from './utils/RetryAdapter'
+import { warnTargetDeprecation } from './deprecation'
 
 const packageJson = getPackageInfo()
 import { processStreamingResponse } from './utils/Stream'
@@ -54,6 +55,7 @@ import { context, trace, propagation, SpanStatusCode } from '@opentelemetry/api'
 import type { NodeSDK } from '@opentelemetry/sdk-node'
 
 export const CODE_TOOLBOX_LANGUAGE_LABEL = 'code-toolbox-language'
+export const V1_API_URL = 'https://app.daytona.io/api'
 
 const DEFAULT_REQUEST_TIMEOUT_MS = 24 * 60 * 60 * 1000
 
@@ -107,7 +109,9 @@ export interface DaytonaConfig {
    * @deprecated Use `apiUrl` instead. This property will be removed in future versions.
    */
   serverUrl?: string
-  /** Default region for Sandboxes and Snapshots; a per-call `target` / `regionId` overrides it */
+  /**
+   * @deprecated Pass `target` per sandbox create call or `regionId` per snapshot create call instead.
+   */
   target?: string
   /** Enable OpenTelemetry tracing for SDK operations. */
   otelEnabled?: boolean
@@ -351,6 +355,9 @@ export class Daytona implements AsyncDisposable {
       this.organizationId = config?.organizationId
       apiUrl = config?.apiUrl || config?.serverUrl
       this.target = config?.target
+      if (config?.target) {
+        warnTargetDeprecation()
+      }
       if (
         config?.requestTimeoutMs !== undefined &&
         (!Number.isFinite(config.requestTimeoutMs) || config.requestTimeoutMs < 0)
@@ -380,7 +387,12 @@ export class Daytona implements AsyncDisposable {
         // Resolved from the process environment only, never from .env / .env.local:
         // the endpoint decides where the credential above is sent.
         apiUrl = apiUrl || reader.getFromProcessEnv('DAYTONA_API_URL') || reader.getFromProcessEnv('DAYTONA_SERVER_URL')
-        this.target = this.target || reader.get('DAYTONA_TARGET')
+        if (!this.target) {
+          this.target = reader.get('DAYTONA_TARGET')
+          if (this.target) {
+            warnTargetDeprecation()
+          }
+        }
 
         if (reader.getFromProcessEnv('DAYTONA_SERVER_URL') && !reader.getFromProcessEnv('DAYTONA_API_URL')) {
           console.warn(
@@ -405,7 +417,7 @@ export class Daytona implements AsyncDisposable {
       }
     }
 
-    this.apiUrl = apiUrl || 'https://app.daytona.io/api'
+    this.apiUrl = apiUrl || V1_API_URL
 
     // A dotenv file that tried to redirect the endpoint is always reported, however the
     // client was configured: it tells the caller the working directory is hostile, which

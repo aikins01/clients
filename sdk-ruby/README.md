@@ -30,20 +30,34 @@ Configure the SDK using [environment variables](https://www.daytona.io/docs/en/c
 
 - `DAYTONA_API_KEY`: Your Daytona [API key](https://www.daytona.io/docs/en/api-keys/)
 - `DAYTONA_API_URL`: The Daytona [API URL](https://www.daytona.io/docs/en/tools/api/)
-- `DAYTONA_TARGET`: Default [region](https://www.daytona.io/docs/en/regions/) for sandboxes and snapshots (e.g. `us`, `eu`); a per-call `target:` / `region_id:` overrides it
+- `DAYTONA_TARGET`: Deprecated default [region](https://www.daytona.io/docs/en/regions/) for sandboxes and snapshots; prefer per-call `target:` / `region_id:`
 
 ```ruby
 require 'daytona'
 
 # Initialize with environment variables
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 
 # Initialize with configuration object
 config = Daytona::Config.new(
   api_key: 'YOUR_API_KEY',
-  api_url: 'YOUR_API_URL',
-  target: 'us'
+  api_url: 'YOUR_API_URL'
 )
+
+daytona = Daytona::Daytona.new(config).v1
+```
+
+## Versioned namespace
+
+Use `Daytona::Daytona.new.v1` and `Daytona::V1::*` for 2.x-compatible code. Root members such as
+`daytona.create` are deprecated in 1.x and removed in 2.x.
+
+```ruby
+require 'daytona'
+
+client = Daytona::Daytona.new
+daytona = client.v1
+image = Daytona::V1::Image.debian_slim('3.12')
 ```
 
 ## Create a sandbox
@@ -54,7 +68,7 @@ Create a sandbox to run your code securely in an isolated environment.
 require 'daytona'
 
 config = Daytona::Config.new(api_key: 'YOUR_API_KEY')
-daytona = Daytona::Daytona.new(config)
+daytona = Daytona::Daytona.new(config).v1
 sandbox = daytona.create
 ```
 
@@ -69,7 +83,7 @@ Pass `target:` in the sandbox create params, or `region_id:` in the snapshot cre
 ```ruby
 require 'daytona'
 
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 sandbox = daytona.create(Daytona::CreateSandboxFromSnapshotParams.new(target: 'eu'))
 snapshot = daytona.snapshot.create(
   Daytona::CreateSnapshotParams.new(name: 'my-snapshot', image: 'python:3.12', region_id: 'eu')
@@ -83,7 +97,7 @@ Create a sandbox with [custom resources](https://www.daytona.io/docs/en/sandboxe
 ```ruby
 require 'daytona'
 
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 sandbox = daytona.create(
     Daytona::CreateSandboxFromImageParams.new(
         image: Daytona::Image.debian_slim('3.12'),
@@ -99,7 +113,7 @@ Create an [ephemeral sandbox](https://www.daytona.io/docs/en/sandboxes/#ephemera
 ```ruby
 require 'daytona'
 
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 sandbox = daytona.create(
     Daytona::CreateSandboxFromSnapshotParams.new(ephemeral: true, auto_stop_interval: 5)
 )
@@ -112,7 +126,7 @@ Create a sandbox from a [snapshot](https://www.daytona.io/docs/en/snapshots/).
 ```ruby
 require 'daytona'
 
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 sandbox = daytona.create(
     Daytona::CreateSandboxFromSnapshotParams.new(
         snapshot: 'my-snapshot-name'

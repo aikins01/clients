@@ -63,7 +63,7 @@ CODE = <<~PYTHON
 PYTHON
 
 def main
-  daytona = Daytona::Daytona.new
+  daytona = Daytona::Daytona.new.v1
 
   sandbox = daytona.create(
     Daytona::CreateSandboxFromImageParams.new(

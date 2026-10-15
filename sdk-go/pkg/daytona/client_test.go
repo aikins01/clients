@@ -4,12 +4,14 @@
 package daytona
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"math"
 	"net/http"
 	"net/http/httptest"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -43,8 +45,8 @@ func TestNewClient(t *testing.T) {
 				assert.Equal(t, defaultAPIURL, c.apiURL)
 				assert.NotNil(t, c.httpClient)
 				assert.NotNil(t, c.apiClient)
-				assert.NotNil(t, c.Volume)
-				assert.NotNil(t, c.Snapshot)
+				assert.NotNil(t, c.V1().Volume)
+				assert.NotNil(t, c.V1().Snapshot)
 			},
 		},
 		{
@@ -204,7 +206,7 @@ func TestNewClientWithConfig(t *testing.T) {
 			name: "custom target in config",
 			config: &types.DaytonaConfig{
 				APIKey: "test-api-key",
-				Target: "custom-target",
+				Target: "custom-target", //nolint:staticcheck // exercises deprecated config precedence until removal.
 			},
 			expectedError: false,
 			validateClient: func(t *testing.T, c *Client) {
@@ -426,7 +428,7 @@ func TestGet(t *testing.T) {
 		require.NoError(t, err)
 
 		ctx := context.Background()
-		sandbox, err := client.Get(ctx, "")
+		sandbox, err := client.V1().Get(ctx, "")
 
 		require.Error(t, err)
 		assert.Contains(t, err.Error(), "sandbox ID or name is required")
@@ -463,7 +465,7 @@ func TestList(t *testing.T) {
 			require.NoError(t, err)
 
 			ctx := context.Background()
-			iter := client.List(ctx, tt.query)
+			iter := client.V1().List(ctx, tt.query)
 			require.NotNil(t, iter)
 
 			// Iter.Next will trigger the (failing) API call. We expect false +
@@ -643,7 +645,7 @@ func TestCreateValidation(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 			defer cancel()
 
-			_, err = client.Create(ctx, tt.params)
+			_, err = client.V1().Create(ctx, tt.params)
 
 			if tt.expectedError {
 				require.Error(t, err)
@@ -908,8 +910,8 @@ func TestServicesInitialization(t *testing.T) {
 	client, err := NewClient()
 	require.NoError(t, err)
 
-	assert.NotNil(t, client.Volume)
-	assert.NotNil(t, client.Snapshot)
+	assert.NotNil(t, client.V1().Volume)
+	assert.NotNil(t, client.V1().Snapshot)
 }
 
 // TestCreateToolboxClient tests the createToolboxClient method
@@ -1055,7 +1057,7 @@ func TestClientCreateSuccessRequestMapping(t *testing.T) {
 		defer server.Close()
 
 		client := createTestClientWithServer(t, server)
-		sandbox, err := client.Create(context.Background(), types.ImageParams{
+		sandbox, err := client.V1().Create(context.Background(), types.ImageParams{
 			Image: "alpine:3.20",
 			SandboxBaseParams: types.SandboxBaseParams{
 				Name: "sandbox-from-image",
@@ -1077,7 +1079,7 @@ func TestClientCreateSuccessRequestMapping(t *testing.T) {
 		defer server.Close()
 
 		client := createTestClientWithServer(t, server)
-		sandbox, err := client.Create(context.Background(), types.SnapshotParams{
+		sandbox, err := client.V1().Create(context.Background(), types.SnapshotParams{
 			Snapshot: "snap-1",
 			SandboxBaseParams: types.SandboxBaseParams{
 				Kvm: true,
@@ -1097,7 +1099,7 @@ func TestClientCreateSuccessRequestMapping(t *testing.T) {
 		defer server.Close()
 
 		client := createTestClientWithServer(t, server)
-		sandbox, err := client.Create(context.Background(), types.SnapshotParams{
+		sandbox, err := client.V1().Create(context.Background(), types.SnapshotParams{
 			Snapshot: "snap-1",
 		}, options.WithWaitForStart(false))
 		require.NoError(t, err)
@@ -1115,7 +1117,7 @@ func TestClientCreateSuccessRequestMapping(t *testing.T) {
 
 		client := createTestClientWithServer(t, server)
 		queueTimeout := 7
-		sandbox, err := client.Create(context.Background(), types.SnapshotParams{
+		sandbox, err := client.V1().Create(context.Background(), types.SnapshotParams{
 			Snapshot: "snap-1",
 			SandboxBaseParams: types.SandboxBaseParams{
 				QueueTimeout: &queueTimeout,
@@ -1136,7 +1138,7 @@ func TestClientCreateSuccessRequestMapping(t *testing.T) {
 		defer server.Close()
 
 		client := createTestClientWithServer(t, server)
-		sandbox, err := client.Create(context.Background(), types.SnapshotParams{
+		sandbox, err := client.V1().Create(context.Background(), types.SnapshotParams{
 			Snapshot:          "snap-123",
 			SandboxBaseParams: types.SandboxBaseParams{Name: "sandbox-from-snapshot"},
 		}, options.WithWaitForStart(false))
@@ -1149,7 +1151,7 @@ func TestClientCreateValidationInvalidLanguage(t *testing.T) {
 	server := httptest.NewServer(http.NotFoundHandler())
 	defer server.Close()
 	client := createTestClientWithServer(t, server)
-	_, err := client.Create(context.Background(), types.ImageParams{
+	_, err := client.V1().Create(context.Background(), types.ImageParams{
 		Image: "alpine:3.20",
 		SandboxBaseParams: types.SandboxBaseParams{
 			Language: types.CodeLanguage("ruby"),
@@ -1173,7 +1175,7 @@ func TestClientCreateValidationRejectsInvalidQueueTimeout(t *testing.T) {
 		{name: "exceeds int32", queueTimeout: math.MaxInt32 + 1},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			_, err := client.Create(context.Background(), types.ImageParams{
+			_, err := client.V1().Create(context.Background(), types.ImageParams{
 				Image: "alpine:3.20",
 				SandboxBaseParams: types.SandboxBaseParams{
 					QueueTimeout: &tc.queueTimeout,
@@ -1193,7 +1195,7 @@ func TestClientGetAndListSuccess(t *testing.T) {
 		defer server.Close()
 
 		client := createTestClientWithServer(t, server)
-		sandbox, err := client.Get(context.Background(), "named-sandbox")
+		sandbox, err := client.V1().Get(context.Background(), "named-sandbox")
 		require.NoError(t, err)
 		assert.Equal(t, "sb-get", sandbox.ID)
 		assert.NotNil(t, sandbox.FileSystem)
@@ -1213,7 +1215,7 @@ func TestClientGetAndListSuccess(t *testing.T) {
 
 		client := createTestClientWithServer(t, server)
 		limit := 2
-		iter := client.List(context.Background(), &ListSandboxesQuery{
+		iter := client.V1().List(context.Background(), &ListSandboxesQuery{
 			Labels: map[string]string{"env": "test"},
 			Limit:  &limit,
 		})
@@ -1305,8 +1307,111 @@ func TestClientCreateTarget(t *testing.T) {
 
 			client := createTestClientWithServer(t, server)
 			client.region = tc.clientTarget
-			_, err := client.Create(context.Background(), tc.params, options.WithWaitForStart(false))
+			_, err := client.V1().Create(context.Background(), tc.params, options.WithWaitForStart(false))
 			require.NoError(t, err)
 		})
+	}
+}
+
+func TestClientV1ReturnsCachedInstanceAndSharedServices(t *testing.T) {
+	t.Setenv("DAYTONA_API_KEY", "test-api-key")
+
+	client, err := NewClient()
+	require.NoError(t, err)
+
+	v1a := client.V1()
+	v1b := client.V1()
+	require.Same(t, v1a, v1b)
+	require.Same(t, v1a.Volume, v1b.Volume)
+	require.Same(t, v1a.Snapshot, v1b.Snapshot)
+	require.Same(t, v1a.Secret, v1b.Secret)
+	require.Same(t, v1a.WarmPool, v1b.WarmPool)
+}
+
+func TestClientV1MethodsDoNotWarn(t *testing.T) {
+	resetDeprecationWarningsForTests()
+	t.Cleanup(resetDeprecationWarningsForTests)
+
+	var stderr bytes.Buffer
+	setDeprecationWarningWriter(&stderr)
+	t.Cleanup(func() { setDeprecationWarningWriter(nil) })
+
+	t.Setenv("DAYTONA_API_KEY", "test-api-key")
+
+	client, err := NewClient()
+	require.NoError(t, err)
+
+	_, err = client.V1().Get(context.Background(), "")
+	require.Error(t, err)
+	assert.Empty(t, stderr.String())
+}
+
+func TestClientDeprecatedMethodsWarnOnce(t *testing.T) {
+	resetDeprecationWarningsForTests()
+	t.Cleanup(resetDeprecationWarningsForTests)
+
+	var stderr bytes.Buffer
+	setDeprecationWarningWriter(&stderr)
+	t.Cleanup(func() { setDeprecationWarningWriter(nil) })
+
+	t.Setenv("DAYTONA_API_KEY", "test-api-key")
+
+	client, err := NewClient()
+	require.NoError(t, err)
+
+	//nolint:staticcheck // exercises the deprecated root wrapper warning contract.
+	_, err = client.Get(context.Background(), "")
+	require.Error(t, err)
+	//nolint:staticcheck // exercises the deprecated root wrapper warning contract.
+	client.List(context.Background(), nil)
+
+	warning := stderr.String()
+	assert.Contains(t, warning, "daytona.Client.Get is deprecated")
+	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
+}
+
+func TestTargetDeprecationWarnsOnce(t *testing.T) {
+	resetDeprecationWarningsForTests()
+	t.Cleanup(resetDeprecationWarningsForTests)
+
+	var stderr bytes.Buffer
+	setDeprecationWarningWriter(&stderr)
+	t.Cleanup(func() { setDeprecationWarningWriter(nil) })
+
+	t.Setenv("DAYTONA_API_KEY", "test-api-key")
+
+	//nolint:staticcheck // exercises the deprecated config field until removal.
+	_, err := NewClientWithConfig(&types.DaytonaConfig{APIKey: "test-api-key", Target: "eu"})
+	require.NoError(t, err)
+
+	t.Setenv("DAYTONA_TARGET", "us")
+	_, err = NewClient()
+	require.NoError(t, err)
+
+	warning := stderr.String()
+	assert.Contains(t, warning, "DaytonaConfig.Target (and DAYTONA_TARGET) is deprecated")
+	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
+}
+
+func TestClientRootMatchesClientV1ExportedMethods(t *testing.T) {
+	rootType := reflect.TypeOf((*Client)(nil))
+	v1Type := reflect.TypeOf((*ClientV1)(nil))
+
+	for idx := range v1Type.NumMethod() {
+		v1Method := v1Type.Method(idx)
+		if !v1Method.IsExported() {
+			continue
+		}
+
+		rootMethod, ok := rootType.MethodByName(v1Method.Name)
+		require.Truef(t, ok, "Client is missing exported method %s", v1Method.Name)
+		require.Equalf(t, v1Method.Type.NumIn(), rootMethod.Type.NumIn(), "Client.%s parameter count drifted", v1Method.Name)
+		for in := 1; in < v1Method.Type.NumIn(); in++ {
+			assert.Equalf(t, v1Method.Type.In(in), rootMethod.Type.In(in), "Client.%s param %d drifted", v1Method.Name, in)
+		}
+		require.Equalf(t, v1Method.Type.NumOut(), rootMethod.Type.NumOut(), "Client.%s return count drifted", v1Method.Name)
+		for out := range v1Method.Type.NumOut() {
+			assert.Equalf(t, v1Method.Type.Out(out), rootMethod.Type.Out(out), "Client.%s return %d drifted", v1Method.Name, out)
+		}
 	}
 }

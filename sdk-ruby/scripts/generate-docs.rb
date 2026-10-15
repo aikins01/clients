@@ -15,6 +15,7 @@ LIB_DIR = File.expand_path('../lib/daytona', __dir__)
 CLASSES_TO_DOCUMENT = [
   ['config.rb', 'config.mdx', 'Daytona::Config'],
   ['daytona.rb', 'daytona.mdx', 'Daytona::Daytona'],
+  ['daytona.rb', 'daytona.mdx', 'Daytona::V1::Daytona'],
   ['sandbox.rb', 'sandbox.mdx', 'Daytona::Sandbox'],
   ['file_system.rb', 'file-system.mdx', 'Daytona::FileSystem'],
   ['git.rb', 'git.mdx', 'Daytona::Git'],
@@ -135,8 +136,10 @@ end
 def generate_markdown_for_object(obj)
   content = []
 
-  # Add main heading
-  content << "## #{obj.name}"
+  # Add main heading; versioned classes keep their namespace so they do not
+  # collide with the root class of the same name on one page.
+  heading = obj.namespace.name == :V1 ? "V1::#{obj.name}" : obj.name
+  content << "## #{heading}"
   content << ''
 
   # Add class description
@@ -263,6 +266,12 @@ def generate_markdown_for_object(obj)
             content << desc
             content << ''
           end
+        end
+
+        deprecated = method.tag(:deprecated)
+        if deprecated
+          content << "**Deprecated**: #{deprecated.text.to_s.strip}".strip
+          content << ''
         end
 
         # Parameters

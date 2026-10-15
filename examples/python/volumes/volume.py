@@ -4,7 +4,7 @@ from daytona import CreateSandboxFromSnapshotParams, Daytona, VolumeMount
 
 
 def main():
-    daytona = Daytona()
+    daytona = Daytona().v1
 
     # Create a new volume or get an existing one
     volume = daytona.volume.get("my-volume", create=True)

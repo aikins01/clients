@@ -5,9 +5,16 @@
 
 require 'json'
 require 'uri'
+require_relative 'sdk/deprecation'
 
 module Daytona
-  class Daytona
+  module V1
+  end
+
+  # The v1 client: creates, retrieves, lists and manages sandboxes and gives access to the
+  # volume, snapshot, secret and warm pool services. Obtain it from `daytona.v1` or create it
+  # directly with `Daytona::V1::Daytona.new(config)`. This is the form that SDK 2.x keeps.
+  class V1::Daytona # rubocop:disable Style/ClassAndModuleChildren
     include Instrumentation
 
     # @return [Daytona::Config]
@@ -441,5 +448,138 @@ module Daytona
 
     HEADER_ORGANIZATION_ID = 'X-Daytona-Organization-ID'
     private_constant :HEADER_ORGANIZATION_ID
+  end
+
+  # The SDK 1.x root client. It owns one `Daytona::V1::Daytona` instance, returned by `v1`. Its other
+  # members forward to that instance and are deprecated: use `daytona.v1` instead, which is
+  # the form SDK 2.x keeps. `close` is not deprecated.
+  class Daytona
+    # @return [Daytona::V1::Daytona]
+    attr_reader :v1
+
+    # @param config [Daytona::Config] Configuration options. Defaults to Daytona::Config.new
+    def initialize(config = Config.new)
+      @v1 = V1::Daytona.new(config)
+    end
+
+    # @deprecated Use `daytona.v1.config` instead. The root form is removed in SDK 2.x.
+    # @return [Daytona::Config]
+    def config
+      Sdk::Deprecation.warn_root_namespace_once('config', uplevel: 2)
+      v1.config
+    end
+
+    # @deprecated Use `daytona.v1.api_client` instead. The root form is removed in SDK 2.x.
+    # @return [DaytonaApiClient]
+    def api_client
+      Sdk::Deprecation.warn_root_namespace_once('api_client', uplevel: 2)
+      v1.api_client
+    end
+
+    # @deprecated Use `daytona.v1.sandbox_api` instead. The root form is removed in SDK 2.x.
+    # @return [DaytonaApiClient::SandboxApi]
+    def sandbox_api
+      Sdk::Deprecation.warn_root_namespace_once('sandbox_api', uplevel: 2)
+      v1.sandbox_api
+    end
+
+    # @deprecated Use `daytona.v1.volume` instead. The root form is removed in SDK 2.x.
+    # @return [Daytona::VolumeService]
+    def volume
+      Sdk::Deprecation.warn_root_namespace_once('volume', uplevel: 2)
+      v1.volume
+    end
+
+    # @deprecated Use `daytona.v1.secret` instead. The root form is removed in SDK 2.x.
+    # @return [Daytona::SecretService]
+    def secret
+      Sdk::Deprecation.warn_root_namespace_once('secret', uplevel: 2)
+      v1.secret
+    end
+
+    # @deprecated Use `daytona.v1.warm_pool` instead. The root form is removed in SDK 2.x.
+    # @return [Daytona::WarmPoolService]
+    def warm_pool
+      Sdk::Deprecation.warn_root_namespace_once('warm_pool', uplevel: 2)
+      v1.warm_pool
+    end
+
+    # @deprecated Use `daytona.v1.object_storage_api` instead. The root form is removed in SDK 2.x.
+    # @return [DaytonaApiClient::ObjectStorageApi]
+    def object_storage_api
+      Sdk::Deprecation.warn_root_namespace_once('object_storage_api', uplevel: 2)
+      v1.object_storage_api
+    end
+
+    # @deprecated Use `daytona.v1.snapshots_api` instead. The root form is removed in SDK 2.x.
+    # @return [DaytonaApiClient::SnapshotsApi]
+    def snapshots_api
+      Sdk::Deprecation.warn_root_namespace_once('snapshots_api', uplevel: 2)
+      v1.snapshots_api
+    end
+
+    # @deprecated Use `daytona.v1.snapshot` instead. The root form is removed in SDK 2.x.
+    # @return [Daytona::SnapshotService]
+    def snapshot
+      Sdk::Deprecation.warn_root_namespace_once('snapshot', uplevel: 2)
+      v1.snapshot
+    end
+
+    # Shuts down OTel providers, flushing any pending telemetry data.
+    #
+    # @return [void]
+    def close = v1.close
+
+    # @deprecated Use `daytona.v1.create` instead. The root form is removed in SDK 2.x.
+    # @param params [Daytona::CreateSandboxFromSnapshotParams, Daytona::CreateSandboxFromImageParams, Nil]
+    # @param on_snapshot_create_logs [Proc, nil]
+    # @return [Daytona::Sandbox]
+    def create(params = nil, on_snapshot_create_logs: nil)
+      Sdk::Deprecation.warn_root_namespace_once('create', uplevel: 2)
+      v1.create(params, on_snapshot_create_logs:)
+    end
+
+    # @deprecated Use `daytona.v1.delete` instead. The root form is removed in SDK 2.x.
+    # @param sandbox [Daytona::Sandbox]
+    # @param wait [Boolean]
+    # @return [void]
+    def delete(sandbox, wait: false)
+      Sdk::Deprecation.warn_root_namespace_once('delete', uplevel: 2)
+      v1.delete(sandbox, wait:)
+    end
+
+    # @deprecated Use `daytona.v1.get` instead. The root form is removed in SDK 2.x.
+    # @param id [String]
+    # @return [Daytona::Sandbox]
+    def get(id)
+      Sdk::Deprecation.warn_root_namespace_once('get', uplevel: 2)
+      v1.get(id)
+    end
+
+    # @deprecated Use `daytona.v1.list` instead. The root form is removed in SDK 2.x.
+    # @param query [Daytona::ListSandboxesQuery, nil]
+    # @return [Enumerator<Daytona::Sandbox>]
+    def list(query = nil)
+      Sdk::Deprecation.warn_root_namespace_once('list', uplevel: 2)
+      v1.list(query)
+    end
+
+    # @deprecated Use `daytona.v1.start` instead. The root form is removed in SDK 2.x.
+    # @param sandbox [Daytona::Sandbox]
+    # @param timeout [Numeric]
+    # @return [void]
+    def start(sandbox, timeout = Sandbox::DEFAULT_TIMEOUT)
+      Sdk::Deprecation.warn_root_namespace_once('start', uplevel: 2)
+      v1.start(sandbox, timeout)
+    end
+
+    # @deprecated Use `daytona.v1.stop` instead. The root form is removed in SDK 2.x.
+    # @param sandbox [Daytona::Sandbox]
+    # @param timeout [Numeric]
+    # @return [void]
+    def stop(sandbox, timeout = Sandbox::DEFAULT_TIMEOUT)
+      Sdk::Deprecation.warn_root_namespace_once('stop', uplevel: 2)
+      v1.stop(sandbox, timeout)
+    end
   end
 end

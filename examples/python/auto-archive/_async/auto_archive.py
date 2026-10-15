@@ -4,7 +4,8 @@ from daytona import AsyncDaytona, CreateSandboxFromSnapshotParams
 
 
 async def main():
-    async with AsyncDaytona() as daytona:
+    async with AsyncDaytona() as daytona_root:
+        daytona = daytona_root.v1
         # Default interval
         sandbox1 = await daytona.create()
         print(sandbox1.auto_archive_interval)

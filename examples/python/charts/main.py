@@ -76,7 +76,7 @@ plt.show()
 
 
 def main():
-    daytona = Daytona()
+    daytona = Daytona().v1
     sandbox = daytona.create(
         CreateSandboxFromImageParams(
             image=Image.debian_slim("3.13").pip_install("matplotlib"),

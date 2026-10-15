@@ -10,7 +10,7 @@ from daytona import (
 
 
 def main():
-    daytona = Daytona()
+    daytona = Daytona().v1
 
     params = CreateSandboxFromImageParams(
         image="python:3.9.23-slim",

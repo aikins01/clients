@@ -2,7 +2,7 @@ from daytona import CreateSandboxFromSnapshotParams, Daytona
 
 
 def main():
-    daytona = Daytona()
+    daytona = Daytona().v1
 
     # Auto-delete is disabled by default
     sandbox1 = daytona.create()

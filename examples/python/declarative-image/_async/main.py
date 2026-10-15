@@ -12,7 +12,7 @@ from daytona import (
 
 
 async def main():
-    daytona = AsyncDaytona()
+    daytona = AsyncDaytona().v1
 
     try:
         # Generate unique name for the snapshot to avoid conflicts

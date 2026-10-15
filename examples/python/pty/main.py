@@ -83,7 +83,7 @@ def kill_pty_session(sandbox: Sandbox):
 
 
 def main():
-    daytona = Daytona()
+    daytona = Daytona().v1
     sandbox = daytona.create()
 
     try:

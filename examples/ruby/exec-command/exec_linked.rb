@@ -4,7 +4,7 @@
 require 'daytona'
 
 def main
-  daytona = Daytona::Daytona.new
+  daytona = Daytona::Daytona.new.v1
 
   owner = daytona.create
   puts "Owner sandbox ready: id=#{owner.id}"

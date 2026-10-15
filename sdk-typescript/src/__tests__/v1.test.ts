@@ -1,0 +1,206 @@
+// Copyright Daytona Platforms Inc.
+// SPDX-License-Identifier: Apache-2.0
+
+import * as fs from 'fs'
+import * as path from 'path'
+
+const createMock = jest.fn(async () => 'created')
+const getMock = jest.fn(async (sandboxId: string) => sandboxId)
+const listMock = jest.fn(async function* () {
+  yield* []
+})
+const startMock = jest.fn(async () => undefined)
+const stopMock = jest.fn(async () => undefined)
+const forkMock = jest.fn(async () => 'forked')
+const experimentalForkMock = jest.fn(async () => 'experimental-forked')
+const deleteMock = jest.fn(async () => undefined)
+const createAxiosInstanceMock = jest.fn(() => ({ mocked: true }))
+const volumeService = { kind: 'volume-service' }
+const snapshotService = { kind: 'snapshot-service' }
+const secretService = { kind: 'secret-service' }
+const warmPoolService = { kind: 'warm-pool-service' }
+
+jest.mock('../Daytona', () => {
+  class MockDaytona {
+    public readonly volume = volumeService
+    public readonly snapshot = snapshotService
+    public readonly secret = secretService
+    public readonly warmPool = warmPoolService
+
+    constructor(readonly config?: unknown) {}
+
+    public create = createMock
+    public get = getMock
+    public list = listMock
+    public start = startMock
+    public stop = stopMock
+    public fork = forkMock
+    public _experimental_fork = experimentalForkMock
+    public delete = deleteMock
+    public [Symbol.asyncDispose] = jest.fn(async () => undefined)
+
+    public static createAxiosInstance = createAxiosInstanceMock
+  }
+
+  return {
+    __esModule: true,
+    CODE_TOOLBOX_LANGUAGE_LABEL: 'code-toolbox-language',
+    CodeLanguage: { PYTHON: 'python', TYPESCRIPT: 'typescript', JAVASCRIPT: 'javascript' },
+    Daytona: MockDaytona,
+    V1_API_URL: 'https://app.daytona.io/api',
+  }
+})
+
+const sharedErrors = [
+  'DaytonaError',
+  'DaytonaBadRequestError',
+  'DaytonaAuthenticationError',
+  'DaytonaForbiddenError',
+  'DaytonaNotFoundError',
+  'DaytonaTimeoutError',
+  'DaytonaConflictError',
+  'DaytonaGoneError',
+  'DaytonaUnprocessableEntityError',
+  'DaytonaRateLimitError',
+  'DaytonaInternalServerError',
+  'DaytonaServiceUnavailableError',
+  'DaytonaConnectionError',
+  'DaytonaValidationError',
+  'DaytonaAuthorizationError',
+] as const
+
+describe('@daytona/sdk/v1 namespace', () => {
+  beforeEach(async () => {
+    jest.clearAllMocks()
+    const { resetRootNamespaceDeprecationWarningForTests } = await import('../deprecation')
+    resetRootNamespaceDeprecationWarningForTests()
+  })
+
+  it('exports the implementation class from v1 and preserves alias identity', async () => {
+    const root = await import('../index')
+    const v1 = await import('../v1')
+    const { Daytona: ImplementationDaytona, V1_API_URL } = await import('../Daytona')
+
+    expect(v1.Daytona).toBe(ImplementationDaytona)
+    expect(v1.Daytona).not.toBe(root.Daytona)
+    expect(v1.DaytonaV1).toBe(ImplementationDaytona)
+    expect(v1.ImageV1).toBe(v1.Image)
+    expect(v1.SandboxV1).toBe(v1.Sandbox)
+    expect(root.V1_API_URL).toBe(V1_API_URL)
+    expect(v1.V1_API_URL).toBe(V1_API_URL)
+
+    expect(v1.DaytonaErrorV1).toBe(v1.DaytonaError)
+    expect(v1.DaytonaAuthenticationErrorV1).toBe(v1.DaytonaAuthenticationError)
+    expect(v1.DaytonaAuthorizationErrorV1).toBe(v1.DaytonaAuthorizationError)
+    expect(v1.DaytonaConflictErrorV1).toBe(v1.DaytonaConflictError)
+    expect(v1.DaytonaConnectionErrorV1).toBe(v1.DaytonaConnectionError)
+    expect(v1.DaytonaNotFoundErrorV1).toBe(v1.DaytonaNotFoundError)
+    expect(v1.DaytonaRateLimitErrorV1).toBe(v1.DaytonaRateLimitError)
+    expect(v1.DaytonaTimeoutErrorV1).toBe(v1.DaytonaTimeoutError)
+    expect(v1.DaytonaValidationErrorV1).toBe(v1.DaytonaValidationError)
+  })
+
+  it('exports the shared error hierarchy from both root and v1', async () => {
+    const root = await import('../index')
+    const v1 = await import('../v1')
+
+    for (const name of sharedErrors) {
+      expect(root).toHaveProperty(name)
+      expect(v1).toHaveProperty(name)
+      expect(v1[name]).toBe(root[name])
+    }
+  })
+
+  it('returns the same v1 instance and does not warn when v1 is accessed directly', async () => {
+    const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
+    const { Daytona } = await import('../index')
+
+    const root = new Daytona({ apiKey: 'api-key' })
+
+    expect(root.v1).toBe(root.v1)
+    expect(emitWarningSpy).not.toHaveBeenCalled()
+
+    emitWarningSpy.mockRestore()
+  })
+
+  it('forwards deprecated root members and warns exactly once until reset', async () => {
+    const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
+    const { Daytona } = await import('../index')
+    const { resetRootNamespaceDeprecationWarningForTests } = await import('../deprecation')
+
+    const root = new Daytona({ apiKey: 'api-key' })
+
+    await expect(root.create()).resolves.toBe('created')
+    await expect(root.get('sandbox-1')).resolves.toBe('sandbox-1')
+    expect(root.volume).toBe(volumeService)
+    expect(root.snapshot).toBe(snapshotService)
+    expect(root.secret).toBe(secretService)
+    expect(root.warmPool).toBe(warmPoolService)
+
+    expect(createMock).toHaveBeenCalledTimes(1)
+    expect(getMock).toHaveBeenCalledWith('sandbox-1')
+    expect(emitWarningSpy).toHaveBeenCalledTimes(1)
+    expect(emitWarningSpy).toHaveBeenCalledWith(
+      expect.stringContaining('daytona.v1.create'),
+      expect.objectContaining({ code: 'DAYTONA_ROOT_NAMESPACE', type: 'DeprecationWarning' }),
+    )
+
+    resetRootNamespaceDeprecationWarningForTests()
+    await root.delete('sandbox-1' as never)
+
+    expect(emitWarningSpy).toHaveBeenCalledTimes(2)
+    expect(deleteMock).toHaveBeenCalledTimes(1)
+
+    emitWarningSpy.mockRestore()
+  })
+
+  it('forwards static members to the implementation class', async () => {
+    const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
+    const { Daytona } = await import('../index')
+
+    expect(Daytona.createAxiosInstance(5000)).toEqual({ mocked: true })
+    expect(createAxiosInstanceMock).toHaveBeenCalledWith(5000)
+    expect(emitWarningSpy).toHaveBeenCalledWith(
+      expect.stringContaining('@daytona/sdk/v1 Daytona.createAxiosInstance'),
+      expect.objectContaining({ code: 'DAYTONA_ROOT_NAMESPACE', type: 'DeprecationWarning' }),
+    )
+
+    emitWarningSpy.mockRestore()
+  })
+
+  it('keeps root wrapper parity with every public implementation member', async () => {
+    const { Daytona: RootDaytona } = await import('../index')
+
+    const source = fs.readFileSync(path.join(__dirname, '..', 'Daytona.ts'), 'utf8')
+    const publicInstanceMembers = new Set<string>()
+    const publicStaticMembers = new Set<string>()
+
+    for (const match of source.matchAll(/^\s*public readonly (\w+)/gm)) {
+      publicInstanceMembers.add(match[1])
+    }
+    for (const match of source.matchAll(/^\s*public(?: async)? (\w+)\s*\(/gm)) {
+      publicInstanceMembers.add(match[1])
+    }
+    // Checked on the real (unmocked) prototype rather than in the source text, so any declaration form counts.
+    const { Daytona: DaytonaImpl } = jest.requireActual<typeof import('../Daytona')>('../Daytona')
+    expect(DaytonaImpl.prototype[Symbol.asyncDispose]).toBeInstanceOf(Function)
+    publicInstanceMembers.add('[Symbol.asyncDispose]')
+    for (const match of source.matchAll(/^\s*public static (\w+)\s*\(/gm)) {
+      publicStaticMembers.add(match[1])
+    }
+
+    const root = new RootDaytona({ apiKey: 'api-key' })
+    for (const member of publicInstanceMembers) {
+      if (member === '[Symbol.asyncDispose]') {
+        expect(RootDaytona.prototype[Symbol.asyncDispose]).toBeInstanceOf(Function)
+        continue
+      }
+
+      expect(member in root).toBe(true)
+    }
+
+    for (const member of publicStaticMembers) {
+      expect(member in RootDaytona).toBe(true)
+    }
+  })
+})

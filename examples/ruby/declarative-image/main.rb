@@ -2,7 +2,7 @@
 
 require 'daytona'
 
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 
 # Generate unique name for the snapshot to avoid conflicts
 snapshot_name = "python-example:#{Time.now.to_i}"

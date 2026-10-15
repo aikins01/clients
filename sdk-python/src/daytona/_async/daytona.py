@@ -49,8 +49,10 @@ from .._utils.errors import intercept_errors
 from .._utils.otel_decorator import with_instrumentation
 from .._utils.stream import process_streaming_response
 from .._utils.timeout import http_timeout, with_timeout
+from .._versioning import warn_target_deprecation_once
 from ..common.daytona import (
     CODE_TOOLBOX_LANGUAGE_LABEL,
+    V1_API_URL,
     CodeLanguage,
     CreateSandboxFromImageParams,
     CreateSandboxFromSnapshotParams,
@@ -168,8 +170,9 @@ class AsyncDaytona:
         If no config is provided, reads from environment variables:
         - `DAYTONA_API_KEY`: Required API key for authentication
         - `DAYTONA_API_URL`: Required api URL
-        - `DAYTONA_TARGET`: Optional default region for Sandboxes and Snapshots (if not provided, default region
-          for the organization is used). A per-call `target` / `region_id` overrides it
+        - `DAYTONA_TARGET`: Deprecated; pass `target` / `region_id` per call instead. Optional default
+          region for Sandboxes and Snapshots (if not provided, default region for the organization is
+          used). A per-call `target` / `region_id` overrides it
 
         Args:
             config (DaytonaConfig | None): Object containing api_key, api_url, and target.
@@ -194,7 +197,6 @@ class AsyncDaytona:
             ```
         """
 
-        default_api_url = "https://app.daytona.io/api"
         self.default_language: CodeLanguage = CodeLanguage.PYTHON
         api_url = None
 
@@ -229,7 +231,10 @@ class AsyncDaytona:
                 or env_reader.get_from_process_env("DAYTONA_API_URL")
                 or env_reader.get_from_process_env("DAYTONA_SERVER_URL")
             )
-            self._target = self._target or env_reader.get("DAYTONA_TARGET")
+            env_target = env_reader.get("DAYTONA_TARGET")
+            if env_target and not self._target:
+                warn_target_deprecation_once()
+            self._target = self._target or env_target
 
             if env_reader.get_from_process_env("DAYTONA_SERVER_URL") and not env_reader.get_from_process_env(
                 "DAYTONA_API_URL"
@@ -241,7 +246,7 @@ class AsyncDaytona:
                     stacklevel=2,
                 )
 
-        self._api_url = api_url or default_api_url
+        self._api_url = api_url or V1_API_URL
 
         # A dotenv file that tried to redirect the endpoint is always reported, however the
         # client was configured: it tells the caller the working directory is hostile, which

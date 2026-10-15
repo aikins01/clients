@@ -2,7 +2,7 @@
 
 require 'daytona'
 
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 sandbox = daytona.create
 
 puts '=== First PTY Session: Interactive Command with Exit ==='

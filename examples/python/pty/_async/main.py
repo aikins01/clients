@@ -82,7 +82,8 @@ async def kill_pty_session(sandbox: AsyncSandbox):
 
 
 async def main():
-    async with AsyncDaytona() as daytona:
+    async with AsyncDaytona() as daytona_root:
+        daytona = daytona_root.v1
         sandbox = await daytona.create()
 
         try:

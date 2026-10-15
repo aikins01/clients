@@ -7,7 +7,8 @@ from daytona import AsyncDaytona, CreateSandboxFromSnapshotParams, FileDownloadR
 
 
 async def main():
-    async with AsyncDaytona() as daytona:
+    async with AsyncDaytona() as daytona_root:
+        daytona = daytona_root.v1
         params = CreateSandboxFromSnapshotParams(
             language="python",
         )

@@ -24,7 +24,7 @@ func main() {
 
 	// Create a sandbox with Python
 	log.Println("Creating sandbox...")
-	sandbox, err := client.Create(ctx, &types.ImageParams{
+	sandbox, err := client.V1().Create(ctx, &types.ImageParams{
 		SandboxBaseParams: types.SandboxBaseParams{
 			Language: types.CodeLanguagePython,
 		},

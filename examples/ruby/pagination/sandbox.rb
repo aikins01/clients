@@ -2,7 +2,7 @@
 
 require 'daytona'
 
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 
 daytona.list(Daytona::ListSandboxesQuery.new(
                limit: 10,

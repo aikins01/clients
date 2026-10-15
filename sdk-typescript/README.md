@@ -28,7 +28,6 @@ Configure the SDK using [environment variables](https://www.daytona.io/docs/en/c
 
 - `DAYTONA_API_KEY`: Your Daytona [API key](https://www.daytona.io/docs/en/api-keys/)
 - `DAYTONA_API_URL`: The Daytona [API URL](https://www.daytona.io/docs/en/tools/api/)
-- `DAYTONA_TARGET`: Default [region](https://www.daytona.io/docs/en/regions/) for sandboxes and snapshots (e.g. `us`, `eu`); a per-call `target` / `regionId` overrides it
 
 ```typescript
 import { Daytona } from '@daytona/sdk'
@@ -40,8 +39,19 @@ const daytona = new Daytona();
 const daytona = new Daytona({
   apiKey: 'YOUR_API_KEY',
   apiUrl: 'YOUR_API_URL',
-  target: 'us',
 });
+```
+
+## Versioned namespace
+
+Use the `v1` namespace for 2.x-compatible code today. Root resource methods are deprecated in 1.x and removed in 2.x.
+
+```typescript
+import { Daytona } from '@daytona/sdk'
+import { Sandbox } from '@daytona/sdk/v1'
+
+const daytona = new Daytona({ apiKey: 'YOUR_API_KEY' })
+const sandbox: Sandbox = await daytona.v1.create({ language: 'typescript' })
 ```
 
 ## Create a sandbox
@@ -52,7 +62,7 @@ Create a sandbox to run your code securely in an isolated environment.
 import { Daytona } from '@daytona/sdk'
 
 const daytona = new Daytona({apiKey: "YOUR_API_KEY"});
-const sandbox = await daytona.create({
+const sandbox = await daytona.v1.create({
   language: 'typescript'
 });
 const response = await sandbox.process.codeRun('console.log("Hello World!")');
@@ -71,8 +81,8 @@ Pass `target` in the sandbox create params, or `regionId` in the snapshot create
 import { Daytona } from '@daytona/sdk'
 
 const daytona = new Daytona()
-const sandbox = await daytona.create({ target: 'eu' })
-const snapshot = await daytona.snapshot.create({ name: 'my-snapshot', image: 'python:3.12', regionId: 'eu' })
+const sandbox = await daytona.v1.create({ target: 'eu' })
+const snapshot = await daytona.v1.snapshot.create({ name: 'my-snapshot', image: 'python:3.12', regionId: 'eu' })
 ```
 
 ### Create a sandbox with custom resources
@@ -83,7 +93,7 @@ Create a sandbox with [custom resources](https://www.daytona.io/docs/en/sandboxe
 import { Daytona, Image } from '@daytona/sdk';
 
 const daytona = new Daytona();
-const sandbox = await daytona.create({
+const sandbox = await daytona.v1.create({
     image: Image.debianSlim('3.12'),
     resources: { cpu: 2, memory: 4, disk: 8 }
 });
@@ -97,7 +107,7 @@ Create an [ephemeral sandbox](https://www.daytona.io/docs/en/sandboxes/#ephemera
 import { Daytona } from '@daytona/sdk';
 
 const daytona = new Daytona();
-const sandbox = await daytona.create({
+const sandbox = await daytona.v1.create({
     ephemeral: true,
     autoStopInterval: 5
 });
@@ -111,7 +121,7 @@ Create a sandbox from a [snapshot](https://www.daytona.io/docs/en/snapshots/).
 import { Daytona } from '@daytona/sdk';
 
 const daytona = new Daytona();
-const sandbox = await daytona.create({
+const sandbox = await daytona.v1.create({
     snapshot: 'my-snapshot-name',
     language: 'typescript'
 });
@@ -193,16 +203,16 @@ Each `list` method returns a different shape depending on the resource. The tabl
 
 | Method | Return type | Shape | Access elements |
 | --- | --- | --- | --- |
-| `daytona.snapshot.list(page?, limit?)` | `Promise<PaginatedSnapshots>` | Paginated wrapper | `result.items.forEach(...)` |
-| `daytona.secret.list(query?)` | `Promise<ListSecretsResponse>` | Cursor-paginated wrapper | `page.items.forEach(...)` |
-| `daytona.volume.list()` | `Promise<Volume[]>` | Bare array | `volumes.forEach(...)` |
-| `daytona.list(query?)` | `AsyncIterableIterator<Sandbox>` | Lazy iterator | `for await (const s of daytona.list())` |
+| `daytona.v1.snapshot.list(page?, limit?)` | `Promise<PaginatedSnapshots>` | Paginated wrapper | `result.items.forEach(...)` |
+| `daytona.v1.secret.list(query?)` | `Promise<ListSecretsResponse>` | Cursor-paginated wrapper | `page.items.forEach(...)` |
+| `daytona.v1.volume.list()` | `Promise<Volume[]>` | Bare array | `volumes.forEach(...)` |
+| `daytona.v1.list(query?)` | `AsyncIterableIterator<Sandbox>` | Lazy iterator | `for await (const s of daytona.v1.list())` |
 
 `PaginatedSnapshots` and `ListSecretsResponse` are **wrapper objects**, not arrays. Calling `.map()` or `.forEach()` directly on them throws `TypeError: result.map is not a function`. Always go through `.items`:
 
 ```typescript
 // snapshots — page-number pagination
-const result = await daytona.snapshot.list(1, 20)
+const result = await daytona.v1.snapshot.list(1, 20)
 // result.items  → Snapshot[]
 // result.total  → number (total across all pages)
 // result.page   → number (current page, 1-indexed)
@@ -212,7 +222,7 @@ result.items.forEach(snapshot => console.log(snapshot.name))
 // secrets — cursor pagination
 let cursor: string | undefined
 do {
-  const page = await daytona.secret.list({ cursor, limit: 50 })
+  const page = await daytona.v1.secret.list({ cursor, limit: 50 })
   // page.items      → Secret[]
   // page.total      → number
   // page.nextCursor → string | null (null = no more pages)
@@ -221,11 +231,11 @@ do {
 } while (cursor)
 
 // volumes — bare array, iterate directly
-const volumes = await daytona.volume.list()
+const volumes = await daytona.v1.volume.list()
 volumes.forEach(vol => console.log(vol.name))
 
 // sandboxes — lazy async iterator, fetches pages on demand
-for await (const sandbox of daytona.list({ labels: { env: 'dev' } })) {
+for await (const sandbox of daytona.v1.list({ labels: { env: 'dev' } })) {
   console.log(sandbox.id)
 }
 ```

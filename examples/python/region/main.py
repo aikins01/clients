@@ -1,10 +1,10 @@
 import time
 
-from daytona import CreateSandboxFromSnapshotParams, CreateSnapshotParams, Daytona, DaytonaConfig, Image
+from daytona import CreateSandboxFromSnapshotParams, CreateSnapshotParams, Daytona, Image
 
 
 def main():
-    daytona = Daytona(DaytonaConfig(target="us"))
+    daytona = Daytona().v1
 
     snapshot1 = f"us-{int(time.time() * 1000)}"
     print(f"Creating snapshot {snapshot1}")

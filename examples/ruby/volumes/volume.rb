@@ -2,7 +2,7 @@
 
 require 'daytona'
 
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 
 # Create a new volume or get an existing one
 volume = daytona.volume.get('my-volume', create: true)

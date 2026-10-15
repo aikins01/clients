@@ -57,10 +57,11 @@ type DaytonaConfig struct {
 	JWTToken       string
 	OrganizationID string
 	APIUrl         string
-	// Target is the default region for sandboxes and snapshots. When empty, the DAYTONA_TARGET
-	// environment variable is used. A per-call [SandboxBaseParams.Target] or
-	// [CreateSnapshotParams.RegionID] overrides it; when neither is set, the organization's
-	// default region is used.
+	// Target is the default target (region) for created sandboxes. When empty, the
+	// DAYTONA_TARGET environment variable is used, then the organization's default region.
+	//
+	// Deprecated: set [SandboxBaseParams.Target] on each create call instead. Target and
+	// the DAYTONA_TARGET environment variable will be removed in a future version.
 	Target      string
 	OtelEnabled bool // Enable OpenTelemetry tracing for SDK operations.
 	// UseDeprecatedPolling observes sandbox state by legacy polling instead of

@@ -11,7 +11,7 @@ from daytona import (
 
 
 def main():
-    daytona = Daytona()
+    daytona = Daytona().v1
 
     # Generate unique name for the snapshot to avoid conflicts
     snapshot_name = f"python-example:{int(time.time())}"

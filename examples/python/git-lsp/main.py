@@ -6,7 +6,7 @@ def section(title: str) -> None:
 
 
 def main():
-    daytona = Daytona()
+    daytona = Daytona().v1
 
     # Custom image with a TypeScript language server (for the LSP showcase) and git.
     sandbox = daytona.create(

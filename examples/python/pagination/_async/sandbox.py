@@ -4,7 +4,8 @@ from daytona import AsyncDaytona, ListSandboxesQuery, SandboxListSortDirection, 
 
 
 async def main():
-    async with AsyncDaytona() as daytona:
+    async with AsyncDaytona() as daytona_root:
+        daytona = daytona_root.v1
         async for sandbox in daytona.list(
             ListSandboxesQuery(
                 limit=10,

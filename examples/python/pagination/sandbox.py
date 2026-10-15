@@ -2,7 +2,7 @@ from daytona import Daytona, ListSandboxesQuery, SandboxListSortDirection, Sandb
 
 
 def main():
-    daytona = Daytona()
+    daytona = Daytona().v1
 
     for sandbox in daytona.list(
         ListSandboxesQuery(

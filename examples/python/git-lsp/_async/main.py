@@ -8,7 +8,8 @@ def section(title: str) -> None:
 
 
 async def main():
-    async with AsyncDaytona() as daytona:
+    async with AsyncDaytona() as daytona_root:
+        daytona = daytona_root.v1
         # Custom image with a TypeScript language server (for the LSP showcase) and git.
         sandbox = await daytona.create(
             CreateSandboxFromImageParams(

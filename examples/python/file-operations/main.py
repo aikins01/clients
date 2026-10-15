@@ -7,7 +7,7 @@ from daytona import CreateSandboxFromSnapshotParams, Daytona, FileDownloadReques
 
 
 def main():
-    daytona = Daytona()
+    daytona = Daytona().v1
     params = CreateSandboxFromSnapshotParams(
         language="python",
     )

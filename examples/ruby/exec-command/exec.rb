@@ -164,7 +164,7 @@ def stateful_code_interpreter(sandbox)
 end
 
 def main
-  daytona = Daytona::Daytona.new
+  daytona = Daytona::Daytona.new.v1
 
   # First, create a sandbox
   image = Daytona::Image.base('python:3.9.23-slim')

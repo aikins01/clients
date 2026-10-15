@@ -5,7 +5,8 @@ from daytona import AsyncDaytona, CreateSandboxFromSnapshotParams, VolumeMount
 
 
 async def main():
-    async with AsyncDaytona() as daytona:
+    async with AsyncDaytona() as daytona_root:
+        daytona = daytona_root.v1
         # Create a new volume or get an existing one
         volume = await daytona.volume.get("my-volume", create=True)
 

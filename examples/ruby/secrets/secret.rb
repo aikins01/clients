@@ -2,7 +2,7 @@
 
 require 'daytona'
 
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 
 # Create an organization secret. The plaintext value is stored encrypted and is
 # never returned by the API again. Use `hosts` to restrict where the value may be sent.

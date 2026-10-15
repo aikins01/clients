@@ -4,7 +4,7 @@ from daytona import Daytona, SessionExecuteRequest
 
 
 async def main():
-    daytona = Daytona()
+    daytona = Daytona().v1
     sandbox = daytona.create()
 
     try:

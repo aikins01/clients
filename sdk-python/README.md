@@ -22,21 +22,25 @@ Configure the SDK using [environment variables](https://www.daytona.io/docs/en/c
 
 - `DAYTONA_API_KEY`: Your Daytona [API key](https://www.daytona.io/docs/en/api-keys/)
 - `DAYTONA_API_URL`: The Daytona [API URL](https://www.daytona.io/docs/en/tools/api/)
-- `DAYTONA_TARGET`: Default [region](https://www.daytona.io/docs/en/regions/) for sandboxes and snapshots (e.g. `us`, `eu`); a per-call `target` / `region_id` overrides it
 
 ```python
 from daytona import Daytona, DaytonaConfig
 
 # Initialize with environment variables
-daytona = Daytona()
+daytona = Daytona().v1
 
 # Initialize with configuration object
 config = DaytonaConfig(
     api_key="YOUR_API_KEY",
     api_url="YOUR_API_URL",
-    target="us"
 )
+daytona = Daytona(config).v1
 ```
+
+## Versioned namespace
+
+Use `daytona.v1` directly, or access the client through `Daytona().v1` / `AsyncDaytona().v1`.
+The root resource methods are deprecated in 1.x and removed in 2.x.
 
 ## Create a sandbox
 
@@ -46,7 +50,7 @@ Create a sandbox to run your code securely in an isolated environment.
 from daytona import Daytona, DaytonaConfig
 
 config = DaytonaConfig(api_key="YOUR_API_KEY")
-daytona = Daytona(config)
+daytona = Daytona(config).v1
 sandbox = daytona.create()
 response = sandbox.process.code_run('print("Hello World")')
 ```
@@ -62,7 +66,7 @@ Pass `target` in the sandbox create params, or `region_id` in `CreateSnapshotPar
 ```python
 from daytona import CreateSandboxFromSnapshotParams, CreateSnapshotParams, Daytona
 
-daytona = Daytona()
+daytona = Daytona().v1
 sandbox = daytona.create(CreateSandboxFromSnapshotParams(target="eu"))
 snapshot = daytona.snapshot.create(CreateSnapshotParams(name="my-snapshot", image="python:3.12", region_id="eu"))
 ```
@@ -74,7 +78,7 @@ Create a sandbox with [custom resources](https://www.daytona.io/docs/en/sandboxe
 ```python
 from daytona import Daytona, CreateSandboxFromImageParams, Image, Resources
 
-daytona = Daytona()
+daytona = Daytona().v1
 sandbox = daytona.create(
     CreateSandboxFromImageParams(
         image=Image.debian_slim("3.12"),
@@ -90,7 +94,7 @@ Create an [ephemeral sandbox](https://www.daytona.io/docs/en/sandboxes/#ephemera
 ```python
 from daytona import Daytona, CreateSandboxFromSnapshotParams
 
-daytona = Daytona()
+daytona = Daytona().v1
 sandbox = daytona.create(
     CreateSandboxFromSnapshotParams(ephemeral=True, auto_stop_interval=5)
 )
@@ -103,7 +107,7 @@ Create a sandbox from a [snapshot](https://www.daytona.io/docs/en/snapshots/).
 ```python
 from daytona import Daytona, CreateSandboxFromSnapshotParams
 
-daytona = Daytona()
+daytona = Daytona().v1
 sandbox = daytona.create(
     CreateSandboxFromSnapshotParams(
         snapshot="my-snapshot-name",

@@ -2,7 +2,7 @@ from daytona import Daytona, SessionExecuteRequest
 
 
 def main():
-    daytona = Daytona()
+    daytona = Daytona().v1
     sandbox = daytona.create()
 
     exec_session_id = "exec-session-1"

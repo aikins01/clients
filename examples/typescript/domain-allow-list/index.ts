@@ -21,7 +21,7 @@ async function main() {
   const domainAllowList = 'google.com,*.google.com'
 
   // The image just needs curl so we can demonstrate the allow list in action.
-  const sandbox = await daytona.create(
+  const sandbox = await daytona.v1.create(
     {
       image: Image.base('ubuntu:22.04').runCommands(
         'apt-get update',
@@ -53,7 +53,7 @@ async function main() {
     await checkAccess(sandbox, 'https://www.google.com') // now blocked
   } finally {
     // cleanup
-    await daytona.delete(sandbox)
+    await daytona.v1.delete(sandbox)
   }
 }
 

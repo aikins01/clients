@@ -4,7 +4,7 @@ require 'fileutils'
 require 'json'
 require 'daytona'
 
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 params = Daytona::CreateSandboxFromSnapshotParams.new(language: Daytona::CodeLanguage::PYTHON)
 
 # Create a Sandbox

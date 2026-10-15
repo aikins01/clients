@@ -6,7 +6,7 @@ def section(title)
   puts "\n=== #{title} ==="
 end
 
-daytona = Daytona::Daytona.new
+daytona = Daytona::Daytona.new.v1
 # Custom image with a TypeScript language server (for the LSP showcase) and git.
 sandbox = daytona.create(
   Daytona::CreateSandboxFromImageParams.new(
