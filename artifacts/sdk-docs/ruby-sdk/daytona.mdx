@@ -424,6 +424,8 @@ Creates a sandbox with the specified parameters
 **Parameters**:
 
 - `params` _Daytona:CreateSandboxFromSnapshotParams, Daytona:CreateSandboxFromImageParams, Nil_ - Sandbox creation parameters
+- `on_snapshot_create_logs` _Proc, nil_ - Called with each line of snapshot build logs when the
+sandbox is created from an image that has to be built
 
 **Returns**:
 

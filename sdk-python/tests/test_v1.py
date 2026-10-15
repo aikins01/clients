@@ -19,6 +19,7 @@ from daytona._versioning import _reset_deprecation_warnings_for_tests
 from daytona.common.daytona import V1_API_URL, CodeLanguage, DaytonaConfig
 from daytona.v1 import SandboxV1
 from daytona_api_client import Configuration as SyncConfiguration
+from daytona_api_client_async import Configuration as AsyncConfiguration
 
 SHARED_ERROR_EXPORTS = (
     "DaytonaError",
@@ -64,7 +65,27 @@ def _make_root_daytona(config: DaytonaConfig | None = None) -> daytona.Daytona:
         return daytona.Daytona(config)
 
 
-def _public_v1_members(client: daytona_v1.Daytona) -> list[str]:
+def _make_root_async_daytona(config: DaytonaConfig | None = None) -> daytona.AsyncDaytona:
+    with (
+        patch("daytona._async.daytona.ApiClient") as mock_api_cls,
+        patch("daytona._async.daytona.ToolboxApiClient") as mock_toolbox_cls,
+    ):
+        mock_api_instance = MagicMock()
+        mock_api_instance.configuration = AsyncConfiguration(host="https://test.daytona.io/api")
+        mock_api_instance.default_headers = {}
+        mock_api_instance.user_agent = ""
+        mock_api_instance.close = AsyncMock()
+        mock_api_cls.return_value = mock_api_instance
+
+        mock_toolbox_instance = MagicMock()
+        mock_toolbox_instance.default_headers = {}
+        mock_toolbox_instance.close = AsyncMock()
+        mock_toolbox_cls.return_value = mock_toolbox_instance
+
+        return daytona.AsyncDaytona(config)
+
+
+def _public_v1_members(client: daytona_v1.Daytona | daytona_v1.AsyncDaytona) -> list[str]:
     instance_members = {name for name in vars(client) if not name.startswith("_")}
     class_members = {name for name in dir(type(client)) if not name.startswith("_")}
     return sorted(instance_members | class_members)
@@ -230,6 +251,16 @@ class TestRootAsyncDaytonaWrapper:
         v1_client.start.assert_awaited_once_with(sandbox, 7)
         v1_client.stop.assert_awaited_once_with(sandbox, 8)
         v1_client.delete.assert_awaited_once_with(sandbox, 9, wait=True)
+
+    def test_root_wrapper_has_v1_parity_with_async_client(self, monkeypatch):
+        monkeypatch.delenv("DAYTONA_TARGET", raising=False)
+
+        root_client = _make_root_async_daytona(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", DeprecationWarning)
+            missing_members = [name for name in _public_v1_members(root_client.v1) if not hasattr(root_client, name)]
+
+        assert missing_members == []
 
 
 class TestTargetDeprecation:

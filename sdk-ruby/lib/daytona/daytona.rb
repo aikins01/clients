@@ -109,6 +109,8 @@ module Daytona
     # Creates a sandbox with the specified parameters
     #
     # @param params [Daytona::CreateSandboxFromSnapshotParams, Daytona::CreateSandboxFromImageParams, Nil] Sandbox creation parameters
+    # @param on_snapshot_create_logs [Proc, nil] Called with each line of snapshot build logs when the
+    #   sandbox is created from an image that has to be built
     # @return [Daytona::Sandbox] The created sandbox
     # @raise [Daytona::Sdk::Error] If auto_stop_interval, auto_pause_interval, auto_archive_interval, or ttl_minutes is negative,
     #   if queue_timeout is not a positive integer, or if auto_stop_interval and auto_pause_interval are both non-zero
