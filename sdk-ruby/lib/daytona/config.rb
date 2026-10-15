@@ -123,10 +123,11 @@ module Daytona
     # @param jwt_token [String, nil] Daytona JWT token. Defaults to ENV['DAYTONA_JWT_TOKEN'].
     # @param api_url [String, nil] Daytona API URL. Defaults to ENV['DAYTONA_API_URL'] or Daytona::Config::API_URL.
     # @param organization_id [String, nil] Daytona organization ID. Defaults to ENV['DAYTONA_ORGANIZATION_ID'].
-    # @param target [String, nil] Default region for Sandboxes and Snapshots; a per-call `target:` / `region_id:`
-    #   overrides it. Defaults to ENV['DAYTONA_TARGET'].
+    # @param target [String, nil] Deprecated: pass `target:` per sandbox create and `region_id:` per snapshot
+    #   create instead. Default region for Sandboxes and Snapshots; a per-call `target:` / `region_id:`
+    #   overrides it. Defaults to ENV['DAYTONA_TARGET'] (also deprecated).
     # @param otel_enabled [Boolean, nil] Enable OpenTelemetry tracing for SDK operations.
-    # @param use_deprecated_polling [Boolean, nil] Observe sandbox state by legacy polling instead of
+    # @param use_deprecated_polling [Boolean, nil] Deprecated. Observe sandbox state by legacy polling instead of
     #   WebSocket event streaming. Defaults to false (event streaming). Can also be enabled via the
     #   DAYTONA_USE_DEPRECATED_POLLING environment variable.
     # @param _experimental [Hash, nil] Experimental configuration options.

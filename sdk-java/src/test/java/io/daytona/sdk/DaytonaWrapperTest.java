@@ -75,8 +75,11 @@ class DaytonaWrapperTest {
     }
 
     private static String methodSignature(Method method) {
-        return method.getName() + "(" + Arrays.stream(method.getParameterTypes())
-                .map(Class::getName)
-                .collect(Collectors.joining(",")) + ")";
+        // Generic parameter and return types, so e.g. Consumer<String> vs Consumer<Object> counts as drift.
+        return method.getGenericReturnType().getTypeName() + " " + method.getName() + "("
+                + Arrays.stream(method.getGenericParameterTypes())
+                        .map(java.lang.reflect.Type::getTypeName)
+                        .collect(Collectors.joining(","))
+                + ")";
     }
 }

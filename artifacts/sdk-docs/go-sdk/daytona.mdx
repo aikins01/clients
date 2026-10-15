@@ -41,6 +41,7 @@ client, err := daytona.NewClientWithConfig(&types.DaytonaConfig{
     APIKey: "your-api-key",
     APIUrl: "https://your-instance.daytona.io/api",
 })
+v1 := client.V1()
 ```
 
 ### Creating Sandboxes
@@ -653,7 +654,7 @@ sandbox, err := client.Create(ctx, types.ImageParams{
 })
 ```
 
-By default, Create waits for the sandbox to reach the started state before returning. Use \[options.WithWaitForStart\]\(false\) to return immediately after creation.
+By default, Create waits for the sandbox to reach the started state before returning. Pass options.WithWaitForStart\(false\) \(see \[options.WithWaitForStart\]\) to return immediately after creation.
 
 Optional parameters can be configured using functional options:
 
@@ -827,7 +828,7 @@ sandbox, err := v1.Create(ctx, types.ImageParams{
 })
 ```
 
-By default, Create waits for the sandbox to reach the started state before returning. Use \[options.WithWaitForStart\]\(false\) to return immediately after creation.
+By default, Create waits for the sandbox to reach the started state before returning. Pass options.WithWaitForStart\(false\) \(see \[options.WithWaitForStart\]\) to return immediately after creation.
 
 Optional parameters can be configured using functional options:
 

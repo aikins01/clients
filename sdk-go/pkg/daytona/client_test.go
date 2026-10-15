@@ -13,6 +13,7 @@ import (
 	"net/http/httptest"
 	"reflect"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -1391,6 +1392,25 @@ func TestTargetDeprecationWarnsOnce(t *testing.T) {
 	warning := stderr.String()
 	assert.Contains(t, warning, "DaytonaConfig.Target (and DAYTONA_TARGET) is deprecated")
 	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
+}
+
+func TestClientV1ConcurrentFirstAccessReturnsOneInstance(t *testing.T) {
+	client := &Client{}
+	results := make([]*ClientV1, 16)
+	var wg sync.WaitGroup
+	for i := range results {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			results[i] = client.V1()
+		}()
+	}
+	wg.Wait()
+
+	require.NotNil(t, results[0])
+	for _, got := range results {
+		assert.Same(t, results[0], got)
+	}
 }
 
 func TestClientRootMatchesClientV1ExportedFields(t *testing.T) {

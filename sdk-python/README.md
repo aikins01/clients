@@ -35,10 +35,9 @@ daytona = Daytona(config).v1
 ```
 
 To keep code portable to SDK 2.x, pass only `api_key`, `jwt_token` and `organization_id`
-to the root `DaytonaConfig`. A custom API URL is not portable: on 2.x the root client's
-`.v1` always uses `V1_API_URL` (override with the `DAYTONA_V1_API_URL` environment variable).
-If you need one, build the v1 client directly with
-`from daytona.v1 import Daytona, DaytonaConfig`.
+to the root `DaytonaConfig`. A custom API URL is not portable through the root client, because
+in SDK 2.x the root client's `.v1` always uses `V1_API_URL`. If you need one, build the v1
+client directly with `from daytona.v1 import Daytona, DaytonaConfig`.
 
 ## Versioned namespace
 

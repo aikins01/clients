@@ -277,6 +277,17 @@ class TestTargetDeprecation:
         assert "DaytonaConfig.target" in str(deprecations[0].message)
         assert "DAYTONA_TARGET" in str(deprecations[0].message)
 
+    def test_target_assignment_after_construction_warns_once(self):
+        config = DaytonaConfig(api_key="test-key", api_url="https://api.test.io")
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            config.target = "us"
+            config.target = "eu"
+            assert config.target == "eu"
+
+        assert [warning.filename for warning in caught if "DaytonaConfig.target" in str(warning.message)] == [__file__]
+
     def test_target_warning_is_attributed_to_the_caller(self):
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")

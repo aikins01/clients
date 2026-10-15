@@ -130,6 +130,13 @@ class DaytonaConfig(BaseModel):
             warn_target_deprecation_once()
         return values
 
+    @override
+    def __setattr__(self, name: str, value: object) -> None:
+        # The validator above only runs on construction; warn on a later `config.target = ...` too.
+        if name == "target" and value:
+            warn_target_deprecation_once()
+        super().__setattr__(name, value)
+
 
 def resolve_bool_flag(explicit_value: bool | None, env_value: str | None) -> bool:
     if explicit_value is not None:

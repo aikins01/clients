@@ -49,8 +49,9 @@ daytona = Daytona::Daytona.new(config).v1
 
 ## Versioned namespace
 
-Use `Daytona::Daytona.new.v1` and `Daytona::V1::*` for 2.x-compatible code. Root members such as
-`daytona.create` are deprecated in 1.x and removed in 2.x.
+Use `Daytona::Daytona.new.v1` and `Daytona::V1::*` for 2.x-compatible code. The root client's resource
+methods and service readers, such as `daytona.create` and `daytona.snapshot`, are deprecated in 1.x and
+removed in 2.x; `close` is not deprecated.
 
 ```ruby
 require 'daytona'

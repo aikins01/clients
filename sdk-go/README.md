@@ -92,6 +92,9 @@ client, err := daytona.NewClientWithConfig(config)
 
 `client.V1()` is the 2.x-compatible SDK 1.x surface. New code should call resource APIs through `client.V1()`.
 The root shortcuts remain for backwards compatibility, are deprecated, and will be removed in SDK 2.x.
+The first call to a deprecated root method prints one deprecation warning to stderr per process. The
+root service fields (`Volume`, `Snapshot`, `Secret`, `WarmPool`, `Otel`) cannot warn at runtime, since
+Go fields have no accessor; they carry a `Deprecated:` comment that `staticcheck` and `gopls` report.
 
 ### Create a sandbox or snapshot in a specific region
 

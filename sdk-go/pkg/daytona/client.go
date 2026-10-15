@@ -30,6 +30,7 @@
 //	    APIKey: "your-api-key",
 //	    APIUrl: "https://your-instance.daytona.io/api",
 //	})
+//	v1 := client.V1()
 //
 // # Creating Sandboxes
 //
@@ -115,6 +116,7 @@ type Client struct {
 	httpClient      *http.Client       // HTTP client for API requests
 	defaultLanguage types.CodeLanguage // Default programming language for code execution
 	v1              *ClientV1
+	v1Once          sync.Once
 
 	// Deprecated: Use client.V1().Otel instead. The root form is removed in SDK 2.x.
 	Otel *otelState
@@ -444,7 +446,7 @@ func (c *Client) createToolboxClient(proxyURL string, sandboxID string) (*toolbo
 //	})
 //
 // By default, Create waits for the sandbox to reach the started state before returning.
-// Use [options.WithWaitForStart](false) to return immediately after creation.
+// Pass options.WithWaitForStart(false) (see [options.WithWaitForStart]) to return immediately after creation.
 //
 // Optional parameters can be configured using functional options:
 //   - [options.WithTimeout]: Set maximum wait time for creation

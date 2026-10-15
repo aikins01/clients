@@ -49,9 +49,12 @@ func (c *Client) V1() *ClientV1 {
 	if c == nil {
 		return nil
 	}
-	if c.v1 == nil {
-		c.v1 = newClientV1(c)
-	}
+	// NewClient sets v1; the lazy path only covers a Client built without it.
+	c.v1Once.Do(func() {
+		if c.v1 == nil {
+			c.v1 = newClientV1(c)
+		}
+	})
 	return c.v1
 }
 
@@ -107,7 +110,7 @@ func (c *ClientV1) Close(ctx context.Context) error {
 //	})
 //
 // By default, Create waits for the sandbox to reach the started state before returning.
-// Use [options.WithWaitForStart](false) to return immediately after creation.
+// Pass options.WithWaitForStart(false) (see [options.WithWaitForStart]) to return immediately after creation.
 //
 // Optional parameters can be configured using functional options:
 //   - [options.WithTimeout]: Set maximum wait time for creation
