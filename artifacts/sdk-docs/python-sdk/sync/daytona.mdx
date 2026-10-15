@@ -27,6 +27,8 @@ It can be initialized either with explicit configuration or using environment va
 
   Using environment variables:
 ```python
+from daytona.v1 import CreateSandboxFromSnapshotParams, Daytona, DaytonaConfig
+
 daytona = Daytona()  # Uses DAYTONA_API_KEY, DAYTONA_API_URL
 sandbox = daytona.create()
 ```
@@ -81,7 +83,7 @@ used). A per-call `target` / `region_id` overrides it
 **Example**:
 
 ```python
-from daytona import Daytona, DaytonaConfig
+from daytona.v1 import Daytona, DaytonaConfig
 # Using environment variables
 daytona1 = Daytona()
 

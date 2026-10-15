@@ -127,6 +127,8 @@ class AsyncDaytona:
     Example:
         Using environment variables:
         ```python
+        from daytona.v1 import AsyncDaytona, CreateSandboxFromSnapshotParams, DaytonaConfig
+
         async with AsyncDaytona() as daytona:  # Uses DAYTONA_API_KEY, DAYTONA_API_URL
             sandbox = await daytona.create()
         ```
@@ -183,7 +185,7 @@ class AsyncDaytona:
 
         Example:
             ```python
-            from daytona import Daytona, DaytonaConfig
+            from daytona.v1 import AsyncDaytona, DaytonaConfig
             # Using environment variables
             daytona1 = AsyncDaytona()
             await daytona1.close()

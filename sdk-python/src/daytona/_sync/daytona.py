@@ -81,6 +81,8 @@ class Daytona:
     Example:
         Using environment variables:
         ```python
+        from daytona.v1 import CreateSandboxFromSnapshotParams, Daytona, DaytonaConfig
+
         daytona = Daytona()  # Uses DAYTONA_API_KEY, DAYTONA_API_URL
         sandbox = daytona.create()
         ```
@@ -134,7 +136,7 @@ class Daytona:
 
         Example:
             ```python
-            from daytona import Daytona, DaytonaConfig
+            from daytona.v1 import Daytona, DaytonaConfig
             # Using environment variables
             daytona1 = Daytona()
 
