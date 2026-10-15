@@ -51,6 +51,7 @@ def _make_root_daytona(config: DaytonaConfig | None = None) -> daytona.Daytona:
     with (
         patch("daytona._sync.daytona.ApiClient") as mock_api_cls,
         patch("daytona._sync.daytona.ToolboxApiClient") as mock_toolbox_cls,
+        patch("daytona._sync.daytona.SyncEventDispatcher"),
     ):
         mock_api_instance = MagicMock()
         mock_api_instance.configuration = SyncConfiguration(host="https://test.daytona.io/api")
@@ -69,6 +70,7 @@ def _make_root_async_daytona(config: DaytonaConfig | None = None) -> daytona.Asy
     with (
         patch("daytona._async.daytona.ApiClient") as mock_api_cls,
         patch("daytona._async.daytona.ToolboxApiClient") as mock_toolbox_cls,
+        patch("daytona._async.daytona.AsyncEventDispatcher"),
     ):
         mock_api_instance = MagicMock()
         mock_api_instance.configuration = AsyncConfiguration(host="https://test.daytona.io/api")
