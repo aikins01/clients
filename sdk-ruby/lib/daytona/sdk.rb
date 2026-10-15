@@ -71,6 +71,8 @@ module Daytona
     SandboxV1 = Sandbox
     ImageV1 = Image
     ConfigV1 = Config
+    ResourcesV1 = Resources
+    ListSandboxesQueryV1 = ListSandboxesQuery
 
     ErrorV1 = Error
     BadRequestErrorV1 = BadRequestError

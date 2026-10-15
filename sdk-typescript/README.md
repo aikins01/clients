@@ -38,9 +38,13 @@ const daytona = new Daytona();
 // Initialize with configuration object
 const daytona = new Daytona({
   apiKey: 'YOUR_API_KEY',
-  apiUrl: 'YOUR_API_URL',
 });
 ```
+
+To keep code portable to SDK 2.x, pass only `apiKey`, `jwtToken` and `organizationId` to the
+root `Daytona`. A custom API URL is not portable: on 2.x the root client's `.v1` always uses
+`V1_API_URL` (override with the `DAYTONA_V1_API_URL` environment variable). If you need one,
+create the v1 client directly with `Daytona` from `@daytona/sdk/v1`.
 
 ## Versioned namespace
 

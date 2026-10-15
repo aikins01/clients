@@ -66,9 +66,10 @@ def _destroyed_by_lifecycle(sandbox: SandboxDto) -> bool:
 
 
 class Daytona:
-    """Main class for interacting with the Daytona API.
+    """The v1 client: creates, manages and interacts with Daytona Sandboxes.
 
-    This class provides methods to create, manage, and interact with Daytona Sandboxes.
+    Get it from the root client as `Daytona().v1` (`from daytona import Daytona`), or import it
+    directly with `from daytona.v1 import Daytona`; the examples below use the direct import.
     It can be initialized either with explicit configuration or using environment variables.
 
     Attributes:

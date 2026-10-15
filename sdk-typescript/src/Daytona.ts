@@ -83,7 +83,8 @@ export interface VolumeMount extends SandboxVolume {
  * is provided, and must be set either here or in the environment variable `DAYTONA_ORGANIZATION_ID`.
  * @property {string} apiUrl - URL of the Daytona API. Defaults to 'https://app.daytona.io/api'
  * if not set here and not set in environment variable DAYTONA_API_URL.
- * @property {string} target - Default region for Sandboxes and Snapshots. A per-call `target` / `regionId` overrides it
+ * @property {string} target - Deprecated: pass `target` per Sandbox create and `regionId` per Snapshot create
+ * instead. Default region for Sandboxes and Snapshots. A per-call `target` / `regionId` overrides it
  * @property {boolean} otelEnabled - OpenTelemetry tracing enabled.
  * If set, all SDK operations will be traced.
  *
@@ -91,7 +92,6 @@ export interface VolumeMount extends SandboxVolume {
  * const config: DaytonaConfig = {
  *     apiKey: "your-api-key",
  *     apiUrl: "https://your-api.com",
- *     target: "us"
  * };
  * const daytona = new Daytona(config);
  */
@@ -272,8 +272,9 @@ export type ForkSandboxParams = {
 }
 
 /**
- * Main class for interacting with the Daytona API.
- * Provides methods for creating, managing, and interacting with Daytona Sandboxes.
+ * The v1 client: creates, manages and interacts with Daytona Sandboxes.
+ * Get it from the root client as `new Daytona().v1` (`Daytona` from `@daytona/sdk`), or import it
+ * directly as `Daytona` from `@daytona/sdk/v1`. The examples below use the direct import.
  * Can be initialized either with explicit configuration or using environment variables.
  *
  * @property {VolumeService} volume - Service for managing Daytona Volumes
@@ -283,18 +284,18 @@ export type ForkSandboxParams = {
  *
  * @example
  * // Using environment variables
- * // Uses DAYTONA_API_KEY, DAYTONA_API_URL, DAYTONA_TARGET
+ * // Uses DAYTONA_API_KEY, DAYTONA_API_URL
  * const daytona = new Daytona();
  * const sandbox = await daytona.create();
  *
  * @example
- * // Using explicit configuration
+ * // Using explicit configuration; the region is chosen per create
  * const config: DaytonaConfig = {
  *     apiKey: "your-api-key",
  *     apiUrl: "https://your-api.com",
- *     target: "us"
  * };
  * const daytona = new Daytona(config);
+ * const sandbox = await daytona.create({ target: 'us' });
  *
  * @example
  * // Disposes daytona and flushes traces when done

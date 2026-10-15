@@ -1393,6 +1393,22 @@ func TestTargetDeprecationWarnsOnce(t *testing.T) {
 	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
 }
 
+func TestClientRootMatchesClientV1ExportedFields(t *testing.T) {
+	rootType := reflect.TypeOf(Client{})
+	v1Type := reflect.TypeOf(ClientV1{})
+
+	for idx := range v1Type.NumField() {
+		v1Field := v1Type.Field(idx)
+		if !v1Field.IsExported() {
+			continue
+		}
+
+		rootField, ok := rootType.FieldByName(v1Field.Name)
+		require.Truef(t, ok, "Client is missing exported field %s", v1Field.Name)
+		assert.Equalf(t, v1Field.Type, rootField.Type, "Client.%s type drifted", v1Field.Name)
+	}
+}
+
 func TestClientRootMatchesClientV1ExportedMethods(t *testing.T) {
 	rootType := reflect.TypeOf((*Client)(nil))
 	v1Type := reflect.TypeOf((*ClientV1)(nil))

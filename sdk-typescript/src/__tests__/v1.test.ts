@@ -170,37 +170,38 @@ describe('@daytona/sdk/v1 namespace', () => {
 
   it('keeps root wrapper parity with every public implementation member', async () => {
     const { Daytona: RootDaytona } = await import('../index')
-
-    const source = fs.readFileSync(path.join(__dirname, '..', 'Daytona.ts'), 'utf8')
-    const publicInstanceMembers = new Set<string>()
-    const publicStaticMembers = new Set<string>()
-
-    for (const match of source.matchAll(/^\s*public readonly (\w+)/gm)) {
-      publicInstanceMembers.add(match[1])
-    }
-    for (const match of source.matchAll(/^\s*public(?: async)? (\w+)\s*\(/gm)) {
-      publicInstanceMembers.add(match[1])
-    }
-    // Checked on the real (unmocked) prototype rather than in the source text, so any declaration form counts.
+    // The real (unmocked) class: its prototype lists every method and accessor whatever the declaration form.
     const { Daytona: DaytonaImpl } = jest.requireActual<typeof import('../Daytona')>('../Daytona')
-    expect(DaytonaImpl.prototype[Symbol.asyncDispose]).toBeInstanceOf(Function)
-    publicInstanceMembers.add('[Symbol.asyncDispose]')
-    for (const match of source.matchAll(/^\s*public static (\w+)\s*\(/gm)) {
-      publicStaticMembers.add(match[1])
+
+    // TypeScript `private` / `protected` members are still on the prototype at runtime; drop them by name.
+    const source = fs.readFileSync(path.join(__dirname, '..', 'Daytona.ts'), 'utf8')
+    const nonPublic = new Set(
+      [...source.matchAll(/^\s*(?:private|protected)\b(?:\s+(?:static|async|readonly|get|set))*\s+(\w+)/gm)].map(
+        (match) => match[1],
+      ),
+    )
+    const isPublic = (name: string) => name !== 'constructor' && !nonPublic.has(name)
+
+    const publicInstanceMembers = new Set<PropertyKey>(
+      Object.getOwnPropertyNames(DaytonaImpl.prototype).filter(isPublic),
+    )
+    publicInstanceMembers.add(Symbol.asyncDispose)
+    // Instance fields are not on the prototype: collect declared public fields from the source.
+    for (const match of source.matchAll(/^\s*public\s+(?:readonly\s+)?(\w+)\s*[?!]?:/gm)) {
+      publicInstanceMembers.add(match[1])
     }
+    const publicStaticMembers = Object.getOwnPropertyNames(DaytonaImpl)
+      .filter((name) => !['length', 'name', 'prototype'].includes(name))
+      .filter(isPublic)
+
+    expect(publicInstanceMembers.has('create')).toBe(true)
+    expect(publicInstanceMembers.has('volume')).toBe(true)
+    expect(publicStaticMembers).toContain('createAxiosInstance')
 
     const root = new RootDaytona({ apiKey: 'api-key' })
-    for (const member of publicInstanceMembers) {
-      if (member === '[Symbol.asyncDispose]') {
-        expect(RootDaytona.prototype[Symbol.asyncDispose]).toBeInstanceOf(Function)
-        continue
-      }
-
-      expect(member in root).toBe(true)
-    }
-
-    for (const member of publicStaticMembers) {
-      expect(member in RootDaytona).toBe(true)
-    }
+    const missingInstance = [...publicInstanceMembers].filter((member) => !(member in root)).map(String)
+    const missingStatic = publicStaticMembers.filter((member) => !(member in RootDaytona))
+    expect(missingInstance).toEqual([])
+    expect(missingStatic).toEqual([])
   })
 })

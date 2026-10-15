@@ -33,6 +33,8 @@ RSpec.describe Daytona::Daytona do
       expect(Daytona::V1::ImageV1).to be(Daytona::Image)
       expect(Daytona::V1::Config).to be(Daytona::Config)
       expect(Daytona::V1::ConfigV1).to be(Daytona::Config)
+      expect(Daytona::V1::ResourcesV1).to be(Daytona::Resources)
+      expect(Daytona::V1::ListSandboxesQueryV1).to be(Daytona::ListSandboxesQuery)
       expect(Daytona::V1::Error).to be(Daytona::Error)
       expect(Daytona::V1::ValidationErrorV1).to be(Daytona::ValidationError)
       expect(Daytona::V1::AuthorizationErrorV1).to be(Daytona::AuthorizationError)

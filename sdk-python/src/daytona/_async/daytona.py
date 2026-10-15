@@ -111,10 +111,12 @@ def _resolve_happy_eyeballs_delay(raw: str | None) -> object:
 
 
 class AsyncDaytona:
-    """Main class for interacting with the Daytona API.
+    """The async v1 client: creates, manages and interacts with Daytona Sandboxes.
 
-    This class provides asynchronous methods to create, manage, and interact with Daytona Sandboxes.
-    It can be initialized either with explicit configuration or using environment variables.
+    Get it from the root client as `AsyncDaytona().v1` (`from daytona import AsyncDaytona`), or
+    import it directly with `from daytona.v1 import AsyncDaytona`; the examples below use the
+    direct import. It can be initialized either with explicit configuration or using environment
+    variables.
 
     Attributes:
         volume (AsyncVolumeService): Service for managing volumes.
