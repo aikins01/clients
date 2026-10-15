@@ -1,4 +1,5 @@
-import { Daytona, Image, Sandbox } from '@daytona/sdk'
+import { Daytona } from '@daytona/sdk'
+import { Image, Sandbox } from '@daytona/sdk/v1'
 
 /**
  * Runs `curl` against a URL inside the sandbox and reports whether the request

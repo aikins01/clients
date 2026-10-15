@@ -1,6 +1,7 @@
 import asyncio
 
-from daytona import AsyncDaytona, CreateSandboxFromImageParams, Image, LspCompletionPosition
+from daytona import AsyncDaytona
+from daytona.v1 import CreateSandboxFromImageParams, Image, LspCompletionPosition
 
 
 def section(title: str) -> None:

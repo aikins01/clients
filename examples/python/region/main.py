@@ -1,6 +1,7 @@
 import time
 
-from daytona import CreateSandboxFromSnapshotParams, CreateSnapshotParams, Daytona, Image
+from daytona import Daytona
+from daytona.v1 import CreateSandboxFromSnapshotParams, CreateSnapshotParams, Image
 
 
 def main():

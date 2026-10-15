@@ -1,4 +1,5 @@
-import { Daytona, Image } from '@daytona/sdk'
+import { Daytona } from '@daytona/sdk'
+import { Image } from '@daytona/sdk/v1'
 
 function section(title: string) {
   console.log(`\n=== ${title} ===`)

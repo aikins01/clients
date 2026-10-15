@@ -208,6 +208,34 @@ class TestRootDaytonaWrapper:
 
         assert [warning for warning in caught if issubclass(warning.category, DeprecationWarning)] == []
 
+    def test_root_close_and_context_manager_close_the_real_v1_client(self, monkeypatch):
+        monkeypatch.delenv("DAYTONA_TARGET", raising=False)
+        config = DaytonaConfig(api_key="test-key", api_url="https://api.test.io")
+
+        with _make_root_daytona(config) as client:
+            http_client = client.v1._http_client  # pylint: disable=protected-access
+            assert not http_client.is_closed
+        assert http_client.is_closed
+
+        client = _make_root_daytona(config)
+        client.close()
+        client.close()
+        assert client.v1._http_client.is_closed  # pylint: disable=protected-access
+
+    def test_root_deprecation_warning_from_existing_env_vars_is_attributed_to_the_caller(self, monkeypatch):
+        monkeypatch.delenv("DAYTONA_TARGET", raising=False)
+        monkeypatch.delenv("DAYTONA_API_URL", raising=False)
+        monkeypatch.setenv("DAYTONA_SERVER_URL", "https://api.test.io")
+        monkeypatch.setenv("DAYTONA_USE_DEPRECATED_POLLING", "true")
+
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            _ = daytona.Daytona(DaytonaConfig(api_key="test-key"))
+
+        relevant = [w for w in caught if "DAYTONA_SERVER_URL" in str(w.message) or "Polling-only" in str(w.message)]
+        assert len(relevant) == 2
+        assert [w.filename for w in relevant] == [__file__, __file__]
+
     def test_root_wrapper_has_v1_parity_with_sync_client(self, monkeypatch):
         monkeypatch.delenv("DAYTONA_TARGET", raising=False)
 

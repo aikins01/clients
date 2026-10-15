@@ -1314,7 +1314,7 @@ func TestClientCreateTarget(t *testing.T) {
 	}
 }
 
-func TestClientV1ReturnsCachedInstanceAndSharedServices(t *testing.T) {
+func TestV1ClientReturnsCachedInstanceAndSharedServices(t *testing.T) {
 	t.Setenv("DAYTONA_API_KEY", "test-api-key")
 
 	client, err := NewClient()
@@ -1329,13 +1329,13 @@ func TestClientV1ReturnsCachedInstanceAndSharedServices(t *testing.T) {
 	require.Same(t, v1a.WarmPool, v1b.WarmPool)
 }
 
-func TestClientV1MethodsDoNotWarn(t *testing.T) {
+func TestV1ClientMethodsDoNotWarn(t *testing.T) {
 	resetDeprecationWarningsForTests()
 	t.Cleanup(resetDeprecationWarningsForTests)
 
 	var stderr bytes.Buffer
-	setDeprecationWarningWriter(&stderr)
-	t.Cleanup(func() { setDeprecationWarningWriter(nil) })
+	SetDeprecationWarningWriter(&stderr)
+	t.Cleanup(func() { SetDeprecationWarningWriter(nil) })
 
 	t.Setenv("DAYTONA_API_KEY", "test-api-key")
 
@@ -1352,8 +1352,8 @@ func TestClientDeprecatedMethodsWarnOnce(t *testing.T) {
 	t.Cleanup(resetDeprecationWarningsForTests)
 
 	var stderr bytes.Buffer
-	setDeprecationWarningWriter(&stderr)
-	t.Cleanup(func() { setDeprecationWarningWriter(nil) })
+	SetDeprecationWarningWriter(&stderr)
+	t.Cleanup(func() { SetDeprecationWarningWriter(nil) })
 
 	t.Setenv("DAYTONA_API_KEY", "test-api-key")
 
@@ -1376,8 +1376,8 @@ func TestTargetDeprecationWarnsOnce(t *testing.T) {
 	t.Cleanup(resetDeprecationWarningsForTests)
 
 	var stderr bytes.Buffer
-	setDeprecationWarningWriter(&stderr)
-	t.Cleanup(func() { setDeprecationWarningWriter(nil) })
+	SetDeprecationWarningWriter(&stderr)
+	t.Cleanup(func() { SetDeprecationWarningWriter(nil) })
 
 	t.Setenv("DAYTONA_API_KEY", "test-api-key")
 
@@ -1394,9 +1394,9 @@ func TestTargetDeprecationWarnsOnce(t *testing.T) {
 	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
 }
 
-func TestClientV1ConcurrentFirstAccessReturnsOneInstance(t *testing.T) {
+func TestV1ClientConcurrentFirstAccessReturnsOneInstance(t *testing.T) {
 	client := &Client{}
-	results := make([]*ClientV1, 16)
+	results := make([]*V1Client, 16)
 	var wg sync.WaitGroup
 	for i := range results {
 		wg.Add(1)
@@ -1413,9 +1413,9 @@ func TestClientV1ConcurrentFirstAccessReturnsOneInstance(t *testing.T) {
 	}
 }
 
-func TestClientRootMatchesClientV1ExportedFields(t *testing.T) {
+func TestClientRootMatchesV1ClientExportedFields(t *testing.T) {
 	rootType := reflect.TypeOf(Client{})
-	v1Type := reflect.TypeOf(ClientV1{})
+	v1Type := reflect.TypeOf(V1Client{})
 
 	for idx := range v1Type.NumField() {
 		v1Field := v1Type.Field(idx)
@@ -1429,9 +1429,9 @@ func TestClientRootMatchesClientV1ExportedFields(t *testing.T) {
 	}
 }
 
-func TestClientRootMatchesClientV1ExportedMethods(t *testing.T) {
+func TestClientRootMatchesV1ClientExportedMethods(t *testing.T) {
 	rootType := reflect.TypeOf((*Client)(nil))
-	v1Type := reflect.TypeOf((*ClientV1)(nil))
+	v1Type := reflect.TypeOf((*V1Client)(nil))
 
 	for idx := range v1Type.NumMethod() {
 		v1Method := v1Type.Method(idx)

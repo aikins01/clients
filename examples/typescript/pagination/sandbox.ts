@@ -1,4 +1,5 @@
-import { Daytona, SandboxListSortDirection, SandboxListSortField, SandboxState } from '@daytona/sdk'
+import { Daytona } from '@daytona/sdk'
+import { SandboxListSortDirection, SandboxListSortField, SandboxState } from '@daytona/sdk/v1'
 
 async function main() {
   const daytona = new Daytona()

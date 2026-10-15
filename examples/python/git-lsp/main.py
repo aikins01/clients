@@ -1,4 +1,5 @@
-from daytona import CreateSandboxFromImageParams, Daytona, Image, LspCompletionPosition
+from daytona import Daytona
+from daytona.v1 import CreateSandboxFromImageParams, Image, LspCompletionPosition
 
 
 def section(title: str) -> None:

@@ -1,4 +1,5 @@
-from daytona import CreateSandboxFromSnapshotParams, Daytona
+from daytona import Daytona
+from daytona.v1 import CreateSandboxFromSnapshotParams
 
 
 def main():

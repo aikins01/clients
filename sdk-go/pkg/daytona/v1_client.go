@@ -10,13 +10,13 @@ import (
 	"github.com/daytona/clients/sdk-go/pkg/options"
 )
 
-// ClientV1 is the versioned Daytona SDK 1.x client surface.
+// V1Client is the versioned Daytona SDK 1.x client surface.
 //
-// ClientV1 provides methods to create, retrieve, list, and manage sandboxes. It handles
+// V1Client provides methods to create, retrieve, list, and manage sandboxes. It handles
 // authentication, API communication, and provides access to services like Volume and Snapshot
 // management.
 //
-// Obtain a ClientV1 from [Client.V1]:
+// Obtain a V1Client from [Client.V1]:
 //
 //	client, err := daytona.NewClient()
 //	if err != nil {
@@ -24,8 +24,8 @@ import (
 //	}
 //	v1 := client.V1()
 //
-// The ClientV1 is safe for concurrent use by multiple goroutines.
-type ClientV1 struct {
+// The V1Client is safe for concurrent use by multiple goroutines.
+type V1Client struct {
 	client *Client
 
 	// Otel holds OpenTelemetry state; nil when OTel is disabled.
@@ -45,25 +45,25 @@ type ClientV1 struct {
 }
 
 // V1 returns the cached v1 client.
-func (c *Client) V1() *ClientV1 {
+func (c *Client) V1() *V1Client {
 	if c == nil {
 		return nil
 	}
 	// NewClient sets v1; the lazy path only covers a Client built without it.
 	c.v1Once.Do(func() {
 		if c.v1 == nil {
-			c.v1 = newClientV1(c)
+			c.v1 = newV1Client(c)
 		}
 	})
 	return c.v1
 }
 
-func newClientV1(client *Client) *ClientV1 {
+func newV1Client(client *Client) *V1Client {
 	if client == nil {
 		return nil
 	}
 
-	return &ClientV1{
+	return &V1Client{
 		client:   client,
 		Otel:     client.Otel,     //nolint:staticcheck // root field must mirror the v1 field for backwards compatibility.
 		Volume:   client.Volume,   //nolint:staticcheck // root field must mirror the v1 field for backwards compatibility.
@@ -83,7 +83,7 @@ func (c *Client) Close(ctx context.Context) error {
 // Close shuts down the client and releases resources.
 // When OpenTelemetry is enabled, Close flushes and shuts down the OTel providers.
 // It is safe to call Close even when OTel is not enabled.
-func (c *ClientV1) Close(ctx context.Context) error {
+func (c *V1Client) Close(ctx context.Context) error {
 	return c.client.close(ctx)
 }
 
@@ -118,7 +118,7 @@ func (c *ClientV1) Close(ctx context.Context) error {
 //   - [options.WithLogChannel]: Receive build logs during image builds
 //
 // Returns the created [Sandbox] or an error if creation fails.
-func (c *ClientV1) Create(ctx context.Context, params any, opts ...func(*options.CreateSandbox)) (*Sandbox, error) {
+func (c *V1Client) Create(ctx context.Context, params any, opts ...func(*options.CreateSandbox)) (*Sandbox, error) {
 	return withInstrumentation(ctx, c.Otel, "Client", "Create", func(ctx context.Context) (*Sandbox, error) {
 		return c.client.doCreate(ctx, params, opts...)
 	})
@@ -140,7 +140,7 @@ func (c *ClientV1) Create(ctx context.Context, params any, opts ...func(*options
 //	    }
 //	    return err
 //	}
-func (c *ClientV1) Get(ctx context.Context, sandboxIDOrName string) (*Sandbox, error) {
+func (c *V1Client) Get(ctx context.Context, sandboxIDOrName string) (*Sandbox, error) {
 	return withInstrumentation(ctx, c.Otel, "Client", "Get", func(ctx context.Context) (*Sandbox, error) {
 		return c.client.doGet(ctx, sandboxIDOrName)
 	})
@@ -149,7 +149,7 @@ func (c *ClientV1) Get(ctx context.Context, sandboxIDOrName string) (*Sandbox, e
 // List returns an iterator over Sandboxes matching the given query, following
 // the [database/sql.Rows] / [bufio.Scanner] iterator pattern.
 //
-// For Go 1.23+ range-over-func consumers, see [ClientV1.ListSeq].
+// For Go 1.23+ range-over-func consumers, see [V1Client.ListSeq].
 //
 // Example:
 //
@@ -160,7 +160,7 @@ func (c *ClientV1) Get(ctx context.Context, sandboxIDOrName string) (*Sandbox, e
 //	if err := iter.Err(); err != nil {
 //	    log.Fatal(err)
 //	}
-func (c *ClientV1) List(ctx context.Context, query *ListSandboxesQuery) *SandboxIterator {
+func (c *V1Client) List(ctx context.Context, query *ListSandboxesQuery) *SandboxIterator {
 	return c.client.list(ctx, query)
 }
 
@@ -176,7 +176,7 @@ func (c *ClientV1) List(ctx context.Context, query *ListSandboxesQuery) *Sandbox
 //	    }
 //	    fmt.Println(sandbox.ID)
 //	}
-func (c *ClientV1) ListSeq(ctx context.Context, query *ListSandboxesQuery) iter.Seq2[*Sandbox, error] {
+func (c *V1Client) ListSeq(ctx context.Context, query *ListSandboxesQuery) iter.Seq2[*Sandbox, error] {
 	return c.client.listSeq(ctx, query)
 }
 

@@ -11,6 +11,7 @@ import warnings
 from collections.abc import Iterator
 from copy import deepcopy
 from importlib.metadata import version
+from types import TracebackType
 from typing import Callable, cast, overload
 
 import httpx
@@ -37,7 +38,7 @@ from .._utils.errors import intercept_errors
 from .._utils.otel_decorator import with_instrumentation
 from .._utils.stream import process_streaming_response
 from .._utils.timeout import http_timeout, with_timeout
-from .._versioning import warn_target_deprecation_once
+from .._versioning import user_stacklevel, warn_target_deprecation_once
 from ..common.daytona import (
     CODE_TOOLBOX_LANGUAGE_LABEL,
     V1_API_URL,
@@ -196,7 +197,7 @@ class Daytona:
                     "Environment variable `DAYTONA_SERVER_URL` is deprecated and will be removed in future versions. "
                     + "Use `DAYTONA_API_URL` instead.",
                     DeprecationWarning,
-                    stacklevel=2,
+                    stacklevel=user_stacklevel(),
                 )
 
         self._api_url = api_url or V1_API_URL
@@ -288,7 +289,7 @@ class Daytona:
                 "Polling-only mode (use_deprecated_polling / DAYTONA_USE_DEPRECATED_POLLING)"
                 " is deprecated and will be removed in a future release."
             )
-            warnings.warn(_polling_msg, DeprecationWarning, stacklevel=2)
+            warnings.warn(_polling_msg, DeprecationWarning, stacklevel=user_stacklevel())
 
         if not use_deprecated_polling:
             self._event_dispatcher = SyncEventDispatcher(
@@ -336,6 +337,38 @@ class Daytona:
 
         # Set the global tracer provider
         trace.set_tracer_provider(self._tracer_provider)
+
+    def __enter__(self) -> Daytona:
+        """Context manager entry."""
+        return self
+
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None = None,
+        exc_value: BaseException | None = None,
+        traceback: TracebackType | None = None,
+    ) -> None:
+        """Context manager exit; closes the client."""
+        self.close()
+
+    def close(self) -> None:
+        """Close the HTTP connections and background workers, and flush OpenTelemetry traces.
+
+        Example:
+            ```python
+            with Daytona() as daytona:
+                sandbox = daytona.create()
+            # Automatically closed
+            ```
+        """
+        if self._tracer_provider is not None:
+            self._tracer_provider.shutdown()
+        self._http_client.close()
+        self._api_client.rest_client.pool_manager.clear()
+        self._toolbox_api_client.rest_client.pool_manager.clear()
+        self._subscription_manager.shutdown()
+        if self._event_dispatcher is not None:
+            self._event_dispatcher.disconnect()
 
     def _get_analytics_api_url(self) -> str | None:
         """Resolves the deployment's Analytics API URL via ``/config``, cached for the client's lifetime."""

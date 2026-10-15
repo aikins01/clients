@@ -1,15 +1,15 @@
+import { Daytona } from '@daytona/sdk'
 import {
   BarChart,
   BoxAndWhiskerChart,
   Chart,
   ChartType,
   CompositeChart,
-  Daytona,
   LineChart,
   PieChart,
   ScatterChart,
   Image,
-} from '@daytona/sdk'
+} from '@daytona/sdk/v1'
 import * as fs from 'fs'
 import * as path from 'path'
 

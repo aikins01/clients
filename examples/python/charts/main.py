@@ -2,14 +2,14 @@ import base64
 import os
 import time
 
-from daytona import (
+from daytona import Daytona
+from daytona.v1 import (
     BarChart,
     BoxAndWhiskerChart,
     Chart,
     ChartType,
     CompositeChart,
     CreateSandboxFromImageParams,
-    Daytona,
     Image,
     LineChart,
     PieChart,

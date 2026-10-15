@@ -44,7 +44,10 @@ func writeDeprecationWarning(message string) {
 	_, _ = fmt.Fprintln(writer, message)
 }
 
-func setDeprecationWarningWriter(writer io.Writer) {
+// SetDeprecationWarningWriter sets where the SDK writes its one-time deprecation warnings
+// (os.Stderr by default). Pass nil or io.Discard to silence them, e.g. in a CLI that renders its
+// own output.
+func SetDeprecationWarningWriter(writer io.Writer) {
 	deprecationWarningWriterMu.Lock()
 	defer deprecationWarningWriterMu.Unlock()
 
@@ -59,5 +62,5 @@ func setDeprecationWarningWriter(writer io.Writer) {
 func resetDeprecationWarningsForTests() {
 	rootNamespaceWarningOnce = sync.Once{}
 	targetWarningOnce = sync.Once{}
-	setDeprecationWarningWriter(os.Stderr)
+	SetDeprecationWarningWriter(os.Stderr)
 }

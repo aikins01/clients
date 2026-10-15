@@ -18,22 +18,34 @@ module Daytona
       LOCK = Mutex.new
       private_constant :LOCK
 
+      # Frames under this directory belong to the SDK; warnings point at the first frame outside it.
+      SDK_DIR = "#{File.expand_path('..', __dir__)}#{File::SEPARATOR}".freeze
+      private_constant :SDK_DIR
+
       module_function
 
-      def warn_root_namespace_once(member, uplevel: 2)
+      def warn_root_namespace_once(member)
         return unless first_warning?(:@root_namespace_warned)
 
         message = [
           "[DEPRECATION] Daytona::Daytona##{member} is deprecated.",
           format(ROOT_NAMESPACE_MESSAGE, member: member)
         ].join(' ')
-        warn(message, uplevel:)
+        warn_from_caller(message)
       end
 
-      def warn_target_once(uplevel: 2)
+      def warn_target_once
         return unless first_warning?(:@target_warned)
 
-        warn("[DEPRECATION] #{TARGET_MESSAGE}", uplevel:)
+        warn_from_caller("[DEPRECATION] #{TARGET_MESSAGE}")
+      end
+
+      # Emits a warning attributed to the first stack frame outside the SDK, so it points at user
+      # code however deep the SDK call path is (e.g. through the root client wrapper).
+      def warn_from_caller(message)
+        locations = caller_locations(1) || []
+        index = locations.index { |location| !location.absolute_path.to_s.start_with?(SDK_DIR) } || 0
+        warn(message, uplevel: index + 1)
       end
 
       def reset_for_tests!

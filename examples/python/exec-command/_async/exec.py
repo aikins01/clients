@@ -1,14 +1,7 @@
 import asyncio
 
-from daytona import (
-    AsyncDaytona,
-    AsyncSandbox,
-    CreateSandboxFromImageParams,
-    DaytonaTimeoutError,
-    ExecutionError,
-    OutputMessage,
-    Resources,
-)
+from daytona import AsyncDaytona, DaytonaTimeoutError
+from daytona.v1 import AsyncSandbox, CreateSandboxFromImageParams, ExecutionError, OutputMessage, Resources
 
 
 async def main():

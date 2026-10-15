@@ -62,6 +62,7 @@ RSpec.describe Daytona::Daytona do
 
       expect(stderr.scan('root form is removed in SDK 2.x').size).to eq(1)
       expect(stderr).to match(/Use `daytona\.v1\.create` instead/)
+      expect(stderr).to start_with("#{__FILE__}:")
 
       expect(client.v1).to have_received(:create).once
       expect(client.v1).to have_received(:list).once

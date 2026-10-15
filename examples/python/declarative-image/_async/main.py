@@ -1,8 +1,8 @@
 import asyncio
 import time
 
-from daytona import (
-    AsyncDaytona,
+from daytona import AsyncDaytona
+from daytona.v1 import (
     CreateSandboxFromImageParams,
     CreateSandboxFromSnapshotParams,
     CreateSnapshotParams,

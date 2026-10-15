@@ -94,7 +94,8 @@ const snapshot = await daytona.v1.snapshot.create({ name: 'my-snapshot', image: 
 Create a sandbox with [custom resources](https://www.daytona.io/docs/en/sandboxes/#resources) (CPU, memory, disk).
 
 ```typescript
-import { Daytona, Image } from '@daytona/sdk';
+import { Daytona } from '@daytona/sdk';
+import { Image } from '@daytona/sdk/v1';
 
 const daytona = new Daytona();
 const sandbox = await daytona.v1.create({

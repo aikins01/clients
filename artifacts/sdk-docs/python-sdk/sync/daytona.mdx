@@ -96,6 +96,40 @@ daytona2 = Daytona(config)
 
 ```
 
+#### Daytona.\_\_enter\_\_
+
+```python
+def __enter__() -> Daytona
+```
+
+Context manager entry.
+
+#### Daytona.\_\_exit\_\_
+
+```python
+def __exit__(exc_type: type[BaseException] | None = None,
+             exc_value: BaseException | None = None,
+             traceback: TracebackType | None = None) -> None
+```
+
+Context manager exit; closes the client.
+
+#### Daytona.close
+
+```python
+def close() -> None
+```
+
+Close the HTTP connections and background workers, and flush OpenTelemetry traces.
+
+**Example**:
+
+```python
+with Daytona() as daytona:
+    sandbox = daytona.create()
+# Automatically closed
+```
+
 #### Daytona.create
 
 ```python

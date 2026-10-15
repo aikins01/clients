@@ -1,7 +1,8 @@
 import asyncio
 import time
 
-from daytona import AsyncDaytona, CreateSandboxFromSnapshotParams, CreateSecretParams, UpdateSecretParams
+from daytona import AsyncDaytona
+from daytona.v1 import CreateSandboxFromSnapshotParams, CreateSecretParams, UpdateSecretParams
 
 
 async def main():

@@ -1,10 +1,10 @@
 import time
 
-from daytona import (
+from daytona import Daytona
+from daytona.v1 import (
     CreateSandboxFromImageParams,
     CreateSandboxFromSnapshotParams,
     CreateSnapshotParams,
-    Daytona,
     Image,
     Resources,
 )

@@ -1,6 +1,7 @@
 import time
 
-from daytona import CreateSandboxFromSnapshotParams, CreateSecretParams, Daytona, UpdateSecretParams
+from daytona import Daytona
+from daytona.v1 import CreateSandboxFromSnapshotParams, CreateSecretParams, UpdateSecretParams
 
 
 def main():

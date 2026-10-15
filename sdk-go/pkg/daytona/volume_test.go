@@ -66,7 +66,7 @@ func createTestClientWithServer(t *testing.T, server *httptest.Server) *Client {
 	snapshotService := NewSnapshotService(client)
 	secretService := NewSecretService(client)
 	warmPoolService := NewWarmPoolService(client)
-	client.v1 = &ClientV1{
+	client.v1 = &V1Client{
 		client:   client,
 		Otel:     nil,
 		Volume:   volumeService,

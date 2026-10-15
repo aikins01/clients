@@ -18,7 +18,7 @@ import (
 // pools of ready-to-use sandboxes for a snapshot. A pool's CurrentSize versus
 // Pool is its status: CurrentSize is the number of ready warm sandboxes, Pool
 // is the desired number, and ErrorReason is set when the pool cannot be
-// filled. Access through [ClientV1.WarmPool].
+// filled. Access through [V1Client.WarmPool].
 //
 // Example:
 //
@@ -41,7 +41,7 @@ type WarmPoolService struct {
 // NewWarmPoolService creates a new WarmPoolService.
 //
 // This is typically called internally by the SDK when creating a [Client].
-// Users should access WarmPoolService through [ClientV1.WarmPool] rather than
+// Users should access WarmPoolService through [V1Client.WarmPool] rather than
 // creating it directly.
 func NewWarmPoolService(client *Client) *WarmPoolService {
 	return &WarmPoolService{

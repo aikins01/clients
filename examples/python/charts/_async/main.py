@@ -3,8 +3,8 @@ import base64
 import os
 import time
 
-from daytona import (
-    AsyncDaytona,
+from daytona import AsyncDaytona
+from daytona.v1 import (
     BarChart,
     BoxAndWhiskerChart,
     Chart,

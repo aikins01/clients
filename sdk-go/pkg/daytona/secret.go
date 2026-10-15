@@ -18,7 +18,7 @@ import (
 // by the API. Secrets can be referenced when creating a sandbox (see the
 // Secrets field on [types.SandboxBaseParams]); the env var injected into the
 // sandbox holds the secret's opaque placeholder, which is resolved to the real
-// value only for the secret's allowed hosts. Access through [ClientV1.Secret].
+// value only for the secret's allowed hosts. Access through [V1Client.Secret].
 //
 // Example:
 //
@@ -42,7 +42,7 @@ type SecretService struct {
 // NewSecretService creates a new SecretService.
 //
 // This is typically called internally by the SDK when creating a [Client].
-// Users should access SecretService through [ClientV1.Secret] rather than
+// Users should access SecretService through [V1Client.Secret] rather than
 // creating it directly.
 func NewSecretService(client *Client) *SecretService {
 	return &SecretService{

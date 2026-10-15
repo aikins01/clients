@@ -95,6 +95,7 @@ The root shortcuts remain for backwards compatibility, are deprecated, and will 
 The first call to a deprecated root method prints one deprecation warning to stderr per process. The
 root service fields (`Volume`, `Snapshot`, `Secret`, `WarmPool`, `Otel`) cannot warn at runtime, since
 Go fields have no accessor; they carry a `Deprecated:` comment that `staticcheck` and `gopls` report.
+Call `daytona.SetDeprecationWarningWriter(io.Discard)` to silence the runtime warnings.
 
 ### Create a sandbox or snapshot in a specific region
 
@@ -219,17 +220,17 @@ result, err := sandbox.Process.ExecuteCommand(ctx, "long-running-command")
 
 - `NewClient() (*Client, error)` - Create a new Daytona client with default configuration
 - `NewClientWithConfig(config *types.DaytonaConfig) (*Client, error)` - Create a new Daytona client with custom configuration
-- `V1() *ClientV1` - The v1 client; returns the same instance on every call
+- `V1() *V1Client` - The v1 client; returns the same instance on every call
 - `Close(ctx) error` - Release client resources
 
-**ClientV1 properties:**
+**V1Client properties:**
 
 - `Volume *VolumeService` - Access volume management operations
 - `Snapshot *SnapshotService` - Access snapshot management operations
 - `Secret *SecretService` - Access organization secret operations
 - `WarmPool *WarmPoolService` - Access warm pool operations
 
-**ClientV1 methods:**
+**V1Client methods:**
 
 - `Create(ctx, params, options...) (*Sandbox, error)` - Create a sandbox from `types.SnapshotParams` or `types.ImageParams` (`nil` uses defaults)
   - Options: `options.WithTimeout(time.Duration)`, `options.WithWaitForStart(bool)`, `options.WithLogChannel(chan string)`

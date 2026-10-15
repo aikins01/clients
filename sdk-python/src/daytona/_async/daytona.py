@@ -49,7 +49,7 @@ from .._utils.errors import intercept_errors
 from .._utils.otel_decorator import with_instrumentation
 from .._utils.stream import process_streaming_response
 from .._utils.timeout import http_timeout, with_timeout
-from .._versioning import warn_target_deprecation_once
+from .._versioning import user_stacklevel, warn_target_deprecation_once
 from ..common.daytona import (
     CODE_TOOLBOX_LANGUAGE_LABEL,
     V1_API_URL,
@@ -245,7 +245,7 @@ class AsyncDaytona:
                     "Environment variable `DAYTONA_SERVER_URL` is deprecated and will be removed in future versions. "
                     + "Use `DAYTONA_API_URL` instead.",
                     DeprecationWarning,
-                    stacklevel=2,
+                    stacklevel=user_stacklevel(),
                 )
 
         self._api_url = api_url or V1_API_URL
@@ -354,7 +354,7 @@ class AsyncDaytona:
                 "Polling-only mode (use_deprecated_polling / DAYTONA_USE_DEPRECATED_POLLING)"
                 " is deprecated and will be removed in a future release."
             )
-            warnings.warn(_polling_msg, DeprecationWarning, stacklevel=2)
+            warnings.warn(_polling_msg, DeprecationWarning, stacklevel=user_stacklevel())
 
         if not use_deprecated_polling:
             self._event_dispatcher = AsyncEventDispatcher(

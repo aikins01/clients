@@ -39,9 +39,9 @@ def root_namespace_message(member_name: str) -> str:
     return ROOT_NAMESPACE_WARNING_TEMPLATE.format(member=member_name)
 
 
-def _user_stacklevel() -> int:
+def user_stacklevel() -> int:
     """Return the `warnings.warn` stacklevel of the first frame outside the SDK and pydantic."""
-    # Level 1 is the caller of warnings.warn, i.e. the warn_*_once helper.
+    # Level 1 is the function calling warnings.warn (and this helper).
     frame = sys._getframe(2)  # pylint: disable=protected-access
     level = 2
     while frame is not None and os.path.abspath(frame.f_code.co_filename).startswith(_INTERNAL_DIRS):
@@ -57,7 +57,7 @@ def warn_root_namespace_once(member_name: str) -> None:
         if _root_namespace_warning_emitted:
             return
         _root_namespace_warning_emitted = True
-    warnings.warn(root_namespace_message(member_name), DeprecationWarning, stacklevel=_user_stacklevel())
+    warnings.warn(root_namespace_message(member_name), DeprecationWarning, stacklevel=user_stacklevel())
 
 
 def warn_target_deprecation_once() -> None:
@@ -67,7 +67,7 @@ def warn_target_deprecation_once() -> None:
         if _target_warning_emitted:
             return
         _target_warning_emitted = True
-    warnings.warn(TARGET_DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=_user_stacklevel())
+    warnings.warn(TARGET_DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=user_stacklevel())
 
 
 def _reset_deprecation_warnings_for_tests() -> None:

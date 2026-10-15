@@ -1,6 +1,7 @@
 import asyncio
 
-from daytona import AsyncDaytona, CreateSandboxFromSnapshotParams
+from daytona import AsyncDaytona
+from daytona.v1 import CreateSandboxFromSnapshotParams
 
 
 async def main():

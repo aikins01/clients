@@ -118,7 +118,7 @@ type Client struct {
 	region          string             // Region for sandbox creation
 	httpClient      *http.Client       // HTTP client for API requests
 	defaultLanguage types.CodeLanguage // Default programming language for code execution
-	v1              *ClientV1
+	v1              *V1Client
 	v1Once          sync.Once
 
 	// Deprecated: Use client.V1().Otel instead. The root form is removed in SDK 2.x.
@@ -307,7 +307,7 @@ func NewClientWithConfig(config *types.DaytonaConfig) (*Client, error) {
 		client.eventDispatcher.EnsureConnected()
 	}
 
-	client.v1 = &ClientV1{
+	client.v1 = &V1Client{
 		client:   client,
 		Otel:     client.Otel,
 		Volume:   volumeService,

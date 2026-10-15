@@ -1,4 +1,5 @@
-from daytona import Daytona, SessionExecuteRequest
+from daytona import Daytona
+from daytona.v1 import SessionExecuteRequest
 
 
 def main():

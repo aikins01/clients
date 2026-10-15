@@ -1,6 +1,7 @@
 import asyncio
 
-from daytona import Daytona, SessionExecuteRequest
+from daytona import Daytona
+from daytona.v1 import SessionExecuteRequest
 
 
 async def main():

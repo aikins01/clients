@@ -11,21 +11,39 @@ import {
 } from './Daytona'
 import { warnRootNamespaceDeprecation } from './deprecation'
 
+/**
+ * The SDK 1.x root client.
+ *
+ * It owns one v1 client, returned by `v1` (the same instance on every access); use
+ * `daytona.v1.<member>`, the form SDK 2.x keeps. `close()` and `await using` are not deprecated.
+ * Every other member forwards to `v1` and is deprecated: the first use in a process emits one
+ * `DeprecationWarning` (code `DAYTONA_ROOT_NAMESPACE`).
+ *
+ * @example
+ * import { Daytona } from '@daytona/sdk'
+ *
+ * const daytona = new Daytona()
+ * const sandbox = await daytona.v1.create()
+ */
 export class Daytona implements AsyncDisposable {
   private readonly client: DaytonaV1
 
+  /** Creates the root client and its v1 client from `config` (or the environment). */
   constructor(config?: DaytonaConfig) {
     this.client = new DaytonaV1(config)
   }
 
+  /** The v1 client (`Daytona` from `@daytona/sdk/v1`); the same instance on every access. */
   public get v1(): DaytonaV1 {
     return this.client
   }
 
+  /** Closes the v1 client. Not deprecated. */
   public close(): Promise<void> {
     return this.client[Symbol.asyncDispose]()
   }
 
+  /** Closes the v1 client, for `await using`. Not deprecated. */
   public [Symbol.asyncDispose](): Promise<void> {
     return this.close()
   }

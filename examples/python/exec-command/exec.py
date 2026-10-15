@@ -1,12 +1,5 @@
-from daytona import (
-    CreateSandboxFromImageParams,
-    Daytona,
-    DaytonaTimeoutError,
-    ExecutionError,
-    OutputMessage,
-    Resources,
-    Sandbox,
-)
+from daytona import Daytona, DaytonaTimeoutError
+from daytona.v1 import CreateSandboxFromImageParams, ExecutionError, OutputMessage, Resources, Sandbox
 
 
 def main():

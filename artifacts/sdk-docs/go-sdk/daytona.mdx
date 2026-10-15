@@ -83,6 +83,7 @@ result, err := sandbox.Process.ExecuteCommand(ctx, "ls -la")
 
 - [Constants](<#constants>)
 - [Variables](<#variables>)
+- [func SetDeprecationWarningWriter\(writer io.Writer\)](<#SetDeprecationWarningWriter>)
 - [type AccessibilityFindOptions](<#AccessibilityFindOptions>)
 - [type AccessibilityService](<#AccessibilityService>)
   - [func NewAccessibilityService\(toolboxClient \*toolbox.APIClient, otel \*otelState\) \*AccessibilityService](<#NewAccessibilityService>)
@@ -100,13 +101,7 @@ result, err := sandbox.Process.ExecuteCommand(ctx, "ls -la")
   - [func \(c \*Client\) Get\(ctx context.Context, sandboxIDOrName string\) \(\*Sandbox, error\)](<#Client.Get>)
   - [func \(c \*Client\) List\(ctx context.Context, query \*ListSandboxesQuery\) \*SandboxIterator](<#Client.List>)
   - [func \(c \*Client\) ListSeq\(ctx context.Context, query \*ListSandboxesQuery\) iter.Seq2\[\*Sandbox, error\]](<#Client.ListSeq>)
-  - [func \(c \*Client\) V1\(\) \*ClientV1](<#Client.V1>)
-- [type ClientV1](<#ClientV1>)
-  - [func \(c \*ClientV1\) Close\(ctx context.Context\) error](<#ClientV1.Close>)
-  - [func \(c \*ClientV1\) Create\(ctx context.Context, params any, opts ...func\(\*options.CreateSandbox\)\) \(\*Sandbox, error\)](<#ClientV1.Create>)
-  - [func \(c \*ClientV1\) Get\(ctx context.Context, sandboxIDOrName string\) \(\*Sandbox, error\)](<#ClientV1.Get>)
-  - [func \(c \*ClientV1\) List\(ctx context.Context, query \*ListSandboxesQuery\) \*SandboxIterator](<#ClientV1.List>)
-  - [func \(c \*ClientV1\) ListSeq\(ctx context.Context, query \*ListSandboxesQuery\) iter.Seq2\[\*Sandbox, error\]](<#ClientV1.ListSeq>)
+  - [func \(c \*Client\) V1\(\) \*V1Client](<#Client.V1>)
 - [type CodeInterpreterService](<#CodeInterpreterService>)
   - [func NewCodeInterpreterService\(toolboxClient \*toolbox.APIClient, otel \*otelState\) \*CodeInterpreterService](<#NewCodeInterpreterService>)
   - [func \(c \*CodeInterpreterService\) CreateContext\(ctx context.Context, cwd \*string\) \(map\[string\]any, error\)](<#CodeInterpreterService.CreateContext>)
@@ -345,6 +340,12 @@ result, err := sandbox.Process.ExecuteCommand(ctx, "ls -la")
 - [type UploadProgress](<#UploadProgress>)
 - [type UploadStreamOption](<#UploadStreamOption>)
   - [func WithUploadProgress\(fn func\(UploadProgress\)\) UploadStreamOption](<#WithUploadProgress>)
+- [type V1Client](<#V1Client>)
+  - [func \(c \*V1Client\) Close\(ctx context.Context\) error](<#V1Client.Close>)
+  - [func \(c \*V1Client\) Create\(ctx context.Context, params any, opts ...func\(\*options.CreateSandbox\)\) \(\*Sandbox, error\)](<#V1Client.Create>)
+  - [func \(c \*V1Client\) Get\(ctx context.Context, sandboxIDOrName string\) \(\*Sandbox, error\)](<#V1Client.Get>)
+  - [func \(c \*V1Client\) List\(ctx context.Context, query \*ListSandboxesQuery\) \*SandboxIterator](<#V1Client.List>)
+  - [func \(c \*V1Client\) ListSeq\(ctx context.Context, query \*ListSandboxesQuery\) iter.Seq2\[\*Sandbox, error\]](<#V1Client.ListSeq>)
 - [type VolumeService](<#VolumeService>)
   - [func NewVolumeService\(client \*Client\) \*VolumeService](<#NewVolumeService>)
   - [func \(v \*VolumeService\) Create\(ctx context.Context, name string\) \(\*types.Volume, error\)](<#VolumeService.Create>)
@@ -437,6 +438,15 @@ fmt.Printf("Daytona SDK version: %s\n", daytona.Version)
 ```go
 var Version = strings.TrimSpace(version)
 ```
+
+<a name="SetDeprecationWarningWriter"></a>
+## func SetDeprecationWarningWriter
+
+```go
+func SetDeprecationWarningWriter(writer io.Writer)
+```
+
+SetDeprecationWarningWriter sets where the SDK writes its one\-time deprecation warnings \(os.Stderr by default\). Pass nil or io.Discard to silence them, e.g. in a CLI that renders its own output.
 
 <a name="AccessibilityFindOptions"></a>
 ## type AccessibilityFindOptions
@@ -747,165 +757,10 @@ Deprecated: Use client.V1\(\).ListSeq instead. The root form is removed in SDK 2
 ### func \(\*Client\) V1
 
 ```go
-func (c *Client) V1() *ClientV1
+func (c *Client) V1() *V1Client
 ```
 
 V1 returns the cached v1 client.
-
-<a name="ClientV1"></a>
-## type ClientV1
-
-ClientV1 is the versioned Daytona SDK 1.x client surface.
-
-ClientV1 provides methods to create, retrieve, list, and manage sandboxes. It handles authentication, API communication, and provides access to services like Volume and Snapshot management.
-
-Obtain a ClientV1 from [Client.V1](<#Client.V1>):
-
-```
-client, err := daytona.NewClient()
-if err != nil {
-    log.Fatal(err)
-}
-v1 := client.V1()
-```
-
-The ClientV1 is safe for concurrent use by multiple goroutines.
-
-```go
-type ClientV1 struct {
-
-    // Otel holds OpenTelemetry state; nil when OTel is disabled.
-    Otel *otelState
-
-    // Volume provides methods for managing persistent volumes.
-    Volume *VolumeService
-
-    // Snapshot provides methods for managing sandbox snapshots.
-    Snapshot *SnapshotService
-
-    // Secret provides methods for managing organization secrets.
-    Secret *SecretService
-
-    // WarmPool provides methods for managing warm pools of ready sandboxes.
-    WarmPool *WarmPoolService
-    // contains filtered or unexported fields
-}
-```
-
-<a name="ClientV1.Close"></a>
-### func \(\*ClientV1\) Close
-
-```go
-func (c *ClientV1) Close(ctx context.Context) error
-```
-
-Close shuts down the client and releases resources. When OpenTelemetry is enabled, Close flushes and shuts down the OTel providers. It is safe to call Close even when OTel is not enabled.
-
-<a name="ClientV1.Create"></a>
-### func \(\*ClientV1\) Create
-
-```go
-func (c *ClientV1) Create(ctx context.Context, params any, opts ...func(*options.CreateSandbox)) (*Sandbox, error)
-```
-
-Create creates a new sandbox with the specified parameters.
-
-The params argument accepts either \[types.SnapshotParams\] to create from a snapshot, or \[types.ImageParams\] to create from a Docker image \(a pointer to either is also accepted\):
-
-```
-// Create from a snapshot
-sandbox, err := v1.Create(ctx, types.SnapshotParams{
-    Snapshot: "my-snapshot",
-    SandboxBaseParams: types.SandboxBaseParams{
-        Name: "my-sandbox",
-    },
-})
-
-// Create from a Docker image
-sandbox, err := v1.Create(ctx, types.ImageParams{
-    Image: "python:3.11",
-    Resources: &types.Resources{
-        CPU:    2,
-        Memory: 4096,
-    },
-})
-```
-
-By default, Create waits for the sandbox to reach the started state before returning. Pass options.WithWaitForStart\(false\) \(see \[options.WithWaitForStart\]\) to return immediately after creation.
-
-Optional parameters can be configured using functional options:
-
-- \[options.WithTimeout\]: Set maximum wait time for creation
-- \[options.WithWaitForStart\]: Control whether to wait for started state
-- \[options.WithLogChannel\]: Receive build logs during image builds
-
-Returns the created [Sandbox](<#Sandbox>) or an error if creation fails.
-
-<a name="ClientV1.Get"></a>
-### func \(\*ClientV1\) Get
-
-```go
-func (c *ClientV1) Get(ctx context.Context, sandboxIDOrName string) (*Sandbox, error)
-```
-
-Get retrieves an existing sandbox by its ID or name.
-
-The sandboxIDOrName parameter accepts either the sandbox's unique ID or its human\-readable name. If a sandbox with the given identifier is not found, a [\\\*github.com/daytona/clients/sdk\\\-go/pkg/errors.DaytonaError](<https://pkg.go.dev/github.com/daytona/clients/sdk-go/pkg/errors/#DaytonaError>) matching [github.com/daytona/clients/sdk\\\-go/pkg/errors.ErrNotFound](<https://pkg.go.dev/github.com/daytona/clients/sdk-go/pkg/errors/#ErrNotFound>) is returned.
-
-Example:
-
-```
-sandbox, err := v1.Get(ctx, "my-sandbox")
-if err != nil {
-    if errors.Is(err, sdkerrors.ErrNotFound) {
-        log.Println("Sandbox not found")
-    }
-    return err
-}
-```
-
-<a name="ClientV1.List"></a>
-### func \(\*ClientV1\) List
-
-```go
-func (c *ClientV1) List(ctx context.Context, query *ListSandboxesQuery) *SandboxIterator
-```
-
-List returns an iterator over Sandboxes matching the given query, following the [database/sql.Rows](<https://pkg.go.dev/database/sql/#Rows>) / [bufio.Scanner](<https://pkg.go.dev/bufio/#Scanner>) iterator pattern.
-
-For Go 1.23\+ range\-over\-func consumers, see [ClientV1.ListSeq](<#ClientV1.ListSeq>).
-
-Example:
-
-```
-iter := v1.List(ctx, &ListSandboxesQuery{Labels: map[string]string{"env": "dev"}})
-for iter.Next() {
-    fmt.Println(iter.Value().ID)
-}
-if err := iter.Err(); err != nil {
-    log.Fatal(err)
-}
-```
-
-<a name="ClientV1.ListSeq"></a>
-### func \(\*ClientV1\) ListSeq
-
-```go
-func (c *ClientV1) ListSeq(ctx context.Context, query *ListSandboxesQuery) iter.Seq2[*Sandbox, error]
-```
-
-ListSeq returns a Go 1.23\+ range\-over\-func iterator over Sandboxes matching the given query. Each yielded pair is \(sandbox, error\); a non\-nil error terminates iteration and the consumer should break out of the range.
-
-Example:
-
-```
-for sandbox, err := range v1.ListSeq(ctx, &ListSandboxesQuery{...}) {
-    if err != nil {
-        log.Fatal(err)
-    }
-    fmt.Println(sandbox.ID)
-}
-```
 
 <a name="CodeInterpreterService"></a>
 ## type CodeInterpreterService
@@ -5780,7 +5635,7 @@ Returns \[types.ScreenshotResponse\] with the captured image.
 
 SecretService provides organization\-scoped secret management operations.
 
-SecretService enables creating, listing, retrieving, updating, and deleting secrets. A secret stores a write\-only plaintext value that is never returned by the API. Secrets can be referenced when creating a sandbox \(see the Secrets field on \[types.SandboxBaseParams\]\); the env var injected into the sandbox holds the secret's opaque placeholder, which is resolved to the real value only for the secret's allowed hosts. Access through [ClientV1.Secret](<#ClientV1>).
+SecretService enables creating, listing, retrieving, updating, and deleting secrets. A secret stores a write\-only plaintext value that is never returned by the API. Secrets can be referenced when creating a sandbox \(see the Secrets field on \[types.SandboxBaseParams\]\); the env var injected into the sandbox holds the secret's opaque placeholder, which is resolved to the real value only for the secret's allowed hosts. Access through [V1Client.Secret](<#V1Client>).
 
 Example:
 
@@ -5814,7 +5669,7 @@ func NewSecretService(client *Client) *SecretService
 
 NewSecretService creates a new SecretService.
 
-This is typically called internally by the SDK when creating a [Client](<#Client>). Users should access SecretService through [ClientV1.Secret](<#ClientV1>) rather than creating it directly.
+This is typically called internally by the SDK when creating a [Client](<#Client>). Users should access SecretService through [V1Client.Secret](<#V1Client>) rather than creating it directly.
 
 <a name="SecretService.Create"></a>
 ### func \(\*SecretService\) Create
@@ -5975,7 +5830,7 @@ Returns the updated \[types.Secret\] or an error if the ID is unknown \(404\).
 
 SnapshotService provides snapshot \(image template\) management operations.
 
-SnapshotService enables creating, managing, and deleting snapshots that serve as templates for sandboxes. Snapshots can be built from Docker images or custom [DockerImage](<#DockerImage>) definitions with build contexts. Access through [ClientV1.Snapshot](<#ClientV1>).
+SnapshotService enables creating, managing, and deleting snapshots that serve as templates for sandboxes. Snapshots can be built from Docker images or custom [DockerImage](<#DockerImage>) definitions with build contexts. Access through [V1Client.Snapshot](<#V1Client>).
 
 Example:
 
@@ -6019,7 +5874,7 @@ func NewSnapshotService(client *Client) *SnapshotService
 
 NewSnapshotService creates a new SnapshotService.
 
-This is typically called internally by the SDK when creating a [Client](<#Client>). Users should access SnapshotService through [ClientV1.Snapshot](<#ClientV1>) rather than creating it directly.
+This is typically called internally by the SDK when creating a [Client](<#Client>). Users should access SnapshotService through [V1Client.Snapshot](<#V1Client>) rather than creating it directly.
 
 <a name="SnapshotService.Activate"></a>
 ### func \(\*SnapshotService\) Activate
@@ -6264,12 +6119,167 @@ func WithUploadProgress(fn func(UploadProgress)) UploadStreamOption
 
 WithUploadProgress returns an option that enables progress tracking for streaming uploads. The callback fires once per chunk written to the wire with the cumulative byte count.
 
+<a name="V1Client"></a>
+## type V1Client
+
+V1Client is the versioned Daytona SDK 1.x client surface.
+
+V1Client provides methods to create, retrieve, list, and manage sandboxes. It handles authentication, API communication, and provides access to services like Volume and Snapshot management.
+
+Obtain a V1Client from [Client.V1](<#Client.V1>):
+
+```
+client, err := daytona.NewClient()
+if err != nil {
+    log.Fatal(err)
+}
+v1 := client.V1()
+```
+
+The V1Client is safe for concurrent use by multiple goroutines.
+
+```go
+type V1Client struct {
+
+    // Otel holds OpenTelemetry state; nil when OTel is disabled.
+    Otel *otelState
+
+    // Volume provides methods for managing persistent volumes.
+    Volume *VolumeService
+
+    // Snapshot provides methods for managing sandbox snapshots.
+    Snapshot *SnapshotService
+
+    // Secret provides methods for managing organization secrets.
+    Secret *SecretService
+
+    // WarmPool provides methods for managing warm pools of ready sandboxes.
+    WarmPool *WarmPoolService
+    // contains filtered or unexported fields
+}
+```
+
+<a name="V1Client.Close"></a>
+### func \(\*V1Client\) Close
+
+```go
+func (c *V1Client) Close(ctx context.Context) error
+```
+
+Close shuts down the client and releases resources. When OpenTelemetry is enabled, Close flushes and shuts down the OTel providers. It is safe to call Close even when OTel is not enabled.
+
+<a name="V1Client.Create"></a>
+### func \(\*V1Client\) Create
+
+```go
+func (c *V1Client) Create(ctx context.Context, params any, opts ...func(*options.CreateSandbox)) (*Sandbox, error)
+```
+
+Create creates a new sandbox with the specified parameters.
+
+The params argument accepts either \[types.SnapshotParams\] to create from a snapshot, or \[types.ImageParams\] to create from a Docker image \(a pointer to either is also accepted\):
+
+```
+// Create from a snapshot
+sandbox, err := v1.Create(ctx, types.SnapshotParams{
+    Snapshot: "my-snapshot",
+    SandboxBaseParams: types.SandboxBaseParams{
+        Name: "my-sandbox",
+    },
+})
+
+// Create from a Docker image
+sandbox, err := v1.Create(ctx, types.ImageParams{
+    Image: "python:3.11",
+    Resources: &types.Resources{
+        CPU:    2,
+        Memory: 4096,
+    },
+})
+```
+
+By default, Create waits for the sandbox to reach the started state before returning. Pass options.WithWaitForStart\(false\) \(see \[options.WithWaitForStart\]\) to return immediately after creation.
+
+Optional parameters can be configured using functional options:
+
+- \[options.WithTimeout\]: Set maximum wait time for creation
+- \[options.WithWaitForStart\]: Control whether to wait for started state
+- \[options.WithLogChannel\]: Receive build logs during image builds
+
+Returns the created [Sandbox](<#Sandbox>) or an error if creation fails.
+
+<a name="V1Client.Get"></a>
+### func \(\*V1Client\) Get
+
+```go
+func (c *V1Client) Get(ctx context.Context, sandboxIDOrName string) (*Sandbox, error)
+```
+
+Get retrieves an existing sandbox by its ID or name.
+
+The sandboxIDOrName parameter accepts either the sandbox's unique ID or its human\-readable name. If a sandbox with the given identifier is not found, a [\\\*github.com/daytona/clients/sdk\\\-go/pkg/errors.DaytonaError](<https://pkg.go.dev/github.com/daytona/clients/sdk-go/pkg/errors/#DaytonaError>) matching [github.com/daytona/clients/sdk\\\-go/pkg/errors.ErrNotFound](<https://pkg.go.dev/github.com/daytona/clients/sdk-go/pkg/errors/#ErrNotFound>) is returned.
+
+Example:
+
+```
+sandbox, err := v1.Get(ctx, "my-sandbox")
+if err != nil {
+    if errors.Is(err, sdkerrors.ErrNotFound) {
+        log.Println("Sandbox not found")
+    }
+    return err
+}
+```
+
+<a name="V1Client.List"></a>
+### func \(\*V1Client\) List
+
+```go
+func (c *V1Client) List(ctx context.Context, query *ListSandboxesQuery) *SandboxIterator
+```
+
+List returns an iterator over Sandboxes matching the given query, following the [database/sql.Rows](<https://pkg.go.dev/database/sql/#Rows>) / [bufio.Scanner](<https://pkg.go.dev/bufio/#Scanner>) iterator pattern.
+
+For Go 1.23\+ range\-over\-func consumers, see [V1Client.ListSeq](<#V1Client.ListSeq>).
+
+Example:
+
+```
+iter := v1.List(ctx, &ListSandboxesQuery{Labels: map[string]string{"env": "dev"}})
+for iter.Next() {
+    fmt.Println(iter.Value().ID)
+}
+if err := iter.Err(); err != nil {
+    log.Fatal(err)
+}
+```
+
+<a name="V1Client.ListSeq"></a>
+### func \(\*V1Client\) ListSeq
+
+```go
+func (c *V1Client) ListSeq(ctx context.Context, query *ListSandboxesQuery) iter.Seq2[*Sandbox, error]
+```
+
+ListSeq returns a Go 1.23\+ range\-over\-func iterator over Sandboxes matching the given query. Each yielded pair is \(sandbox, error\); a non\-nil error terminates iteration and the consumer should break out of the range.
+
+Example:
+
+```
+for sandbox, err := range v1.ListSeq(ctx, &ListSandboxesQuery{...}) {
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Println(sandbox.ID)
+}
+```
+
 <a name="VolumeService"></a>
 ## type VolumeService
 
 VolumeService provides persistent storage volume management operations.
 
-VolumeService enables creating, managing, and deleting persistent storage volumes that can be attached to sandboxes. Volumes persist data independently of sandbox lifecycle and can be shared between sandboxes. Access through [ClientV1.Volume](<#ClientV1>).
+VolumeService enables creating, managing, and deleting persistent storage volumes that can be attached to sandboxes. Volumes persist data independently of sandbox lifecycle and can be shared between sandboxes. Access through [V1Client.Volume](<#V1Client>).
 
 Example:
 
@@ -6305,7 +6315,7 @@ func NewVolumeService(client *Client) *VolumeService
 
 NewVolumeService creates a new VolumeService.
 
-This is typically called internally by the SDK when creating a [Client](<#Client>). Users should access VolumeService through [ClientV1.Volume](<#ClientV1>) rather than creating it directly.
+This is typically called internally by the SDK when creating a [Client](<#Client>). Users should access VolumeService through [V1Client.Volume](<#V1Client>) rather than creating it directly.
 
 <a name="VolumeService.Create"></a>
 ### func \(\*VolumeService\) Create
@@ -6448,7 +6458,7 @@ Returns the updated \[types.Volume\] when ready, or an error if the timeout expi
 
 WarmPoolService provides warm pool management operations.
 
-WarmPoolService enables listing, creating, updating, and deleting warm pools of ready\-to\-use sandboxes for a snapshot. A pool's CurrentSize versus Pool is its status: CurrentSize is the number of ready warm sandboxes, Pool is the desired number, and ErrorReason is set when the pool cannot be filled. Access through [ClientV1.WarmPool](<#ClientV1>).
+WarmPoolService enables listing, creating, updating, and deleting warm pools of ready\-to\-use sandboxes for a snapshot. A pool's CurrentSize versus Pool is its status: CurrentSize is the number of ready warm sandboxes, Pool is the desired number, and ErrorReason is set when the pool cannot be filled. Access through [V1Client.WarmPool](<#V1Client>).
 
 Example:
 
@@ -6481,7 +6491,7 @@ func NewWarmPoolService(client *Client) *WarmPoolService
 
 NewWarmPoolService creates a new WarmPoolService.
 
-This is typically called internally by the SDK when creating a [Client](<#Client>). Users should access WarmPoolService through [ClientV1.WarmPool](<#ClientV1>) rather than creating it directly.
+This is typically called internally by the SDK when creating a [Client](<#Client>). Users should access WarmPoolService through [V1Client.WarmPool](<#V1Client>) rather than creating it directly.
 
 <a name="WarmPoolService.Create"></a>
 ### func \(\*WarmPoolService\) Create

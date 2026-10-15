@@ -66,7 +66,8 @@ Daytona provides [examples](https://www.daytona.io/docs/en/getting-started/#exam
 Pass `target` in the sandbox create params, or `region_id` in `CreateSnapshotParams`, to choose the [region](https://www.daytona.io/docs/en/regions/) for that call. The region is resolved per call: the per-call value, then the client-level `target` (or `DAYTONA_TARGET`), then the organization's default region.
 
 ```python
-from daytona import CreateSandboxFromSnapshotParams, CreateSnapshotParams, Daytona
+from daytona import Daytona
+from daytona.v1 import CreateSandboxFromSnapshotParams, CreateSnapshotParams
 
 daytona = Daytona().v1
 sandbox = daytona.create(CreateSandboxFromSnapshotParams(target="eu"))
@@ -78,7 +79,8 @@ snapshot = daytona.snapshot.create(CreateSnapshotParams(name="my-snapshot", imag
 Create a sandbox with [custom resources](https://www.daytona.io/docs/en/sandboxes/#resources) (CPU, memory, disk).
 
 ```python
-from daytona import Daytona, CreateSandboxFromImageParams, Image, Resources
+from daytona import Daytona
+from daytona.v1 import CreateSandboxFromImageParams, Image, Resources
 
 daytona = Daytona().v1
 sandbox = daytona.create(
@@ -94,7 +96,8 @@ sandbox = daytona.create(
 Create an [ephemeral sandbox](https://www.daytona.io/docs/en/sandboxes/#ephemeral-sandboxes) that is automatically deleted when stopped.
 
 ```python
-from daytona import Daytona, CreateSandboxFromSnapshotParams
+from daytona import Daytona
+from daytona.v1 import CreateSandboxFromSnapshotParams
 
 daytona = Daytona().v1
 sandbox = daytona.create(
@@ -107,7 +110,8 @@ sandbox = daytona.create(
 Create a sandbox from a [snapshot](https://www.daytona.io/docs/en/snapshots/).
 
 ```python
-from daytona import Daytona, CreateSandboxFromSnapshotParams
+from daytona import Daytona
+from daytona.v1 import CreateSandboxFromSnapshotParams
 
 daytona = Daytona().v1
 sandbox = daytona.create(
@@ -229,7 +233,7 @@ for vol in volumes:
     print(vol.name)
 
 # sandboxes — lazy iterator, fetches pages on demand
-from daytona import ListSandboxesQuery
+from daytona.v1 import ListSandboxesQuery
 
 for sandbox in daytona.list(ListSandboxesQuery(labels={"env": "dev"})):
     print(sandbox.id)
