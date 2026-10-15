@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
 	// Create LSP server for Python
 	log.Println("\nCreating LSP server for Python...")
-	lsp := daytona.NewLspServerService(sandbox.ToolboxClient, types.LspLanguagePython, workDir, client.Otel)
+	lsp := daytona.NewLspServerService(sandbox.ToolboxClient, types.LspLanguagePython, workDir, client.V1().Otel)
 
 	// Start the LSP server
 	log.Println("Starting LSP server...")

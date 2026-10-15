@@ -95,5 +95,38 @@ RSpec.describe Daytona::Daytona do
       missing_methods = v1_methods.reject { |method_name| root_methods.include?(method_name) }
       expect(missing_methods).to eq([])
     end
+
+    it 'gives every root forwarder the same parameters as its v1 method' do
+      v1 = Daytona::V1::Daytona
+      mismatched = v1.public_instance_methods(false).reject do |name|
+        v1_method = v1.uninstrumented_method(name) || v1.instance_method(name)
+        v1_method.parameters == described_class.instance_method(name).parameters
+      end
+
+      expect(mismatched).to eq([])
+    end
+  end
+
+  describe 'forwarding of every deprecated method' do
+    {
+      create: [[:params], { on_snapshot_create_logs: :logs }],
+      delete: [[:sandbox], { wait: true }],
+      get: [[:id], {}],
+      list: [[:query], {}],
+      start: [%i[sandbox timeout], {}],
+      stop: [%i[sandbox timeout], {}]
+    }.each do |name, (args, kwargs)|
+      it "forwards #{name} with its arguments" do
+        allow(client.v1).to receive(name).and_return(:result)
+
+        capture_stderr { expect(client.public_send(name, *args, **kwargs)).to eq(:result) }
+
+        if kwargs.empty?
+          expect(client.v1).to have_received(name).with(*args)
+        else
+          expect(client.v1).to have_received(name).with(*args, **kwargs)
+        end
+      end
+    end
   end
 end

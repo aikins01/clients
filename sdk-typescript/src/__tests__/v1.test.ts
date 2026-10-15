@@ -166,6 +166,29 @@ describe('@daytona/sdk/v1 namespace', () => {
     emitWarningSpy.mockRestore()
   })
 
+  it('forwards every deprecated root method with its arguments', async () => {
+    const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
+    const { Daytona } = await import('../index')
+    const root = new Daytona({ apiKey: 'api-key' })
+    const sandbox = { id: 'sandbox-1' } as never
+    const query = { labels: { env: 'dev' } }
+
+    expect(root.list(query)).toBe(listMock.mock.results[0]?.value)
+    expect(listMock).toHaveBeenCalledWith(query)
+    await root.start(sandbox, 7)
+    expect(startMock).toHaveBeenCalledWith(sandbox, 7)
+    await root.stop(sandbox)
+    expect(stopMock).toHaveBeenCalledWith(sandbox)
+    await expect(root.fork(sandbox, { name: 'copy' }, 9)).resolves.toBe('forked')
+    expect(forkMock).toHaveBeenCalledWith(sandbox, { name: 'copy' }, 9)
+    await expect(root._experimental_fork(sandbox, { name: 'copy' }, 9)).resolves.toBe('experimental-forked')
+    expect(experimentalForkMock).toHaveBeenCalledWith(sandbox, { name: 'copy' }, 9)
+    await root.delete(sandbox, 30, true)
+    expect(deleteMock).toHaveBeenCalledWith(sandbox, 30, true)
+
+    emitWarningSpy.mockRestore()
+  })
+
   it('forwards static members to the implementation class', async () => {
     const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
     const { Daytona } = await import('../index')
