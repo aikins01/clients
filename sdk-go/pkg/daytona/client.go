@@ -96,11 +96,12 @@ const (
 	defaultTimeout = 60 * time.Second
 )
 
-// Client is the main entry point for interacting with the Daytona platform.
+// Client is the SDK 1.x root client.
 //
-// Client provides methods to create, retrieve, list, and manage sandboxes. It handles
-// authentication, API communication, and provides access to services like Volume and Snapshot
-// management.
+// It owns one [V1Client], returned by [Client.V1] (the same instance on every call); use
+// client.V1() for sandbox and service operations, the form SDK 2.x keeps. The root resource
+// methods and service fields forward to the V1Client and are deprecated; the first call to a
+// deprecated method prints one deprecation warning per process. [Client.Close] is not deprecated.
 //
 // Create a Client using [NewClient] or [NewClientWithConfig]:
 //

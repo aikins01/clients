@@ -58,6 +58,55 @@ class DaytonaWrapperTest {
         });
     }
 
+    @SuppressWarnings("deprecation")
+    @Test
+    void everyDeprecatedRootOverloadForwardsItsArguments() {
+        DaytonaV1 delegate = Mockito.mock(DaytonaV1.class);
+        Daytona daytona = new Daytona(delegate);
+        io.daytona.sdk.model.CreateSandboxFromSnapshotParams snapshotParams =
+                new io.daytona.sdk.model.CreateSandboxFromSnapshotParams();
+        io.daytona.sdk.model.CreateSandboxFromImageParams imageParams =
+                new io.daytona.sdk.model.CreateSandboxFromImageParams();
+        io.daytona.sdk.model.ListSandboxesQuery query = new io.daytona.sdk.model.ListSandboxesQuery();
+        java.util.function.Consumer<String> onLogs = line -> { };
+
+        TestSupport.withLogCapture(Logger.getLogger(Daytona.class.getName()), records -> {
+            daytona.create();
+            daytona.create(snapshotParams);
+            daytona.create(imageParams);
+            daytona.create(snapshotParams, 11L);
+            daytona.create(imageParams, 12L);
+            daytona.create(imageParams, 13L, onLogs);
+            daytona.get("sandbox-1");
+            daytona.list();
+            daytona.list(query);
+            daytona.listStream();
+            daytona.listStream(query);
+            daytona.snapshot();
+            daytona.volume();
+            daytona.secret();
+            daytona.warmPool();
+            Daytona.resetRootNamespaceWarningForTests();
+        });
+
+        Mockito.verify(delegate).create();
+        Mockito.verify(delegate).create(snapshotParams);
+        Mockito.verify(delegate).create(imageParams);
+        Mockito.verify(delegate).create(snapshotParams, 11L);
+        Mockito.verify(delegate).create(imageParams, 12L);
+        Mockito.verify(delegate).create(imageParams, 13L, onLogs);
+        Mockito.verify(delegate).get("sandbox-1");
+        Mockito.verify(delegate).list();
+        Mockito.verify(delegate).list(query);
+        Mockito.verify(delegate).listStream();
+        Mockito.verify(delegate).listStream(query);
+        Mockito.verify(delegate).snapshot();
+        Mockito.verify(delegate).volume();
+        Mockito.verify(delegate).secret();
+        Mockito.verify(delegate).warmPool();
+        Mockito.verifyNoMoreInteractions(delegate);
+    }
+
     @Test
     void rootWrapperExposesEveryPublicV1MethodWithSameSignature() {
         Set<String> wrapperMethods = Arrays.stream(Daytona.class.getMethods())

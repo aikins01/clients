@@ -1371,6 +1371,63 @@ func TestClientDeprecatedMethodsWarnOnce(t *testing.T) {
 	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
 }
 
+func TestClientDeprecatedMethodsForwardToV1(t *testing.T) {
+	resetDeprecationWarningsForTests()
+	t.Cleanup(resetDeprecationWarningsForTests)
+
+	var stderr bytes.Buffer
+	SetDeprecationWarningWriter(&stderr)
+	t.Cleanup(func() { SetDeprecationWarningWriter(nil) })
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch {
+		case r.Method == http.MethodPost:
+			writeJSONResponse(t, w, http.StatusOK, testSandboxPayload("sb-created", "created", apiclient.SANDBOXSTATE_STARTED))
+		case strings.HasSuffix(r.URL.Path, "/sandbox/sb-get"):
+			writeJSONResponse(t, w, http.StatusOK, testSandboxPayload("sb-get", "got", apiclient.SANDBOXSTATE_STARTED))
+		default:
+			assert.Contains(t, r.URL.Query().Get("labels"), `"env":"dev"`)
+			writeJSONResponse(t, w, http.StatusOK, map[string]any{
+				"items":      []any{testSandboxPayload("sb-list", "listed", apiclient.SANDBOXSTATE_STARTED)},
+				"nextCursor": nil,
+			})
+		}
+	}))
+	defer server.Close()
+
+	client := createTestClientWithServer(t, server)
+	ctx := context.Background()
+	query := &ListSandboxesQuery{Labels: map[string]string{"env": "dev"}}
+
+	//nolint:staticcheck // exercises the deprecated root forwarders.
+	created, err := client.Create(ctx, types.SnapshotParams{Snapshot: "snap"}, options.WithWaitForStart(false))
+	require.NoError(t, err)
+	assert.Equal(t, "sb-created", created.ID)
+
+	//nolint:staticcheck // exercises the deprecated root forwarders.
+	got, err := client.Get(ctx, "sb-get")
+	require.NoError(t, err)
+	assert.Equal(t, "sb-get", got.ID)
+
+	//nolint:staticcheck // exercises the deprecated root forwarders.
+	iter := client.List(ctx, query)
+	require.True(t, iter.Next())
+	assert.Equal(t, "sb-list", iter.Value().ID)
+	require.NoError(t, iter.Err())
+
+	var seqIDs []string
+	//nolint:staticcheck // exercises the deprecated root forwarders.
+	for sandbox, seqErr := range client.ListSeq(ctx, query) {
+		require.NoError(t, seqErr)
+		seqIDs = append(seqIDs, sandbox.ID)
+	}
+	assert.Equal(t, []string{"sb-list"}, seqIDs)
+
+	warning := stderr.String()
+	assert.Contains(t, warning, "daytona.Client.Create is deprecated")
+	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
+}
+
 func TestTargetDeprecationWarnsOnce(t *testing.T) {
 	resetDeprecationWarningsForTests()
 	t.Cleanup(resetDeprecationWarningsForTests)
