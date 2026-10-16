@@ -46,7 +46,11 @@ SHARED_ERROR_EXPORTS = (
 
 
 @pytest.fixture(autouse=True)
-def reset_deprecation_state():
+def reset_deprecation_state(monkeypatch: pytest.MonkeyPatch):
+    # Warning counts must not depend on the developer's shell: these variables emit their own
+    # DeprecationWarnings. Tests that need one set it again with monkeypatch.
+    for name in ("DAYTONA_TARGET", "DAYTONA_USE_DEPRECATED_POLLING", "DAYTONA_SERVER_URL"):
+        monkeypatch.delenv(name, raising=False)
     _reset_deprecation_warnings_for_tests()
     yield
     _reset_deprecation_warnings_for_tests()
