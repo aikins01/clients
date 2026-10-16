@@ -12,7 +12,7 @@ def main
   # Linked sandboxes must be ephemeral — `ephemeral: true` sets
   # `auto_delete_interval=0` automatically.
   follower = daytona.create(
-    Daytona::CreateSandboxFromSnapshotParams.new(
+    Daytona::V1::CreateSandboxFromSnapshotParams.new(
       linked_sandbox: owner.id,
       ephemeral: true
     )

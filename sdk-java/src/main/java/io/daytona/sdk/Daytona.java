@@ -3,6 +3,7 @@
 
 package io.daytona.sdk;
 
+import io.daytona.sdk.exception.DaytonaException;
 import io.daytona.sdk.model.CreateSandboxFromImageParams;
 import io.daytona.sdk.model.CreateSandboxFromSnapshotParams;
 import io.daytona.sdk.model.ListSandboxesQuery;

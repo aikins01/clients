@@ -1490,6 +1490,22 @@ func TestClientCloseDoesNotWarn(t *testing.T) {
 	assert.Empty(t, stderr.String())
 }
 
+func TestRootServiceFieldsShareServicesAtConstructionOnly(t *testing.T) {
+	t.Setenv("DAYTONA_API_KEY", "test-api-key")
+	t.Setenv("DAYTONA_TARGET", "")
+
+	client, err := NewClient()
+	require.NoError(t, err)
+
+	//nolint:staticcheck // pins the documented behaviour of the deprecated root fields.
+	assert.Same(t, client.V1().Volume, client.Volume)
+
+	replacement := &VolumeService{}
+	//nolint:staticcheck // pins the documented behaviour of the deprecated root fields.
+	client.Volume = replacement
+	assert.NotSame(t, replacement, client.V1().Volume)
+}
+
 func TestV1ClientConcurrentFirstAccessReturnsOneInstance(t *testing.T) {
 	client := &Client{}
 	results := make([]*V1Client, 16)

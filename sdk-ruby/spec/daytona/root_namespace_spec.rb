@@ -89,16 +89,17 @@ RSpec.describe Daytona::Daytona do
 
   describe 'wrapper parity' do
     it 'defines every public v1 instance method on the root wrapper' do
-      v1_methods = Daytona::V1::Daytona.public_instance_methods(false).sort
-      root_methods = described_class.public_instance_methods(false)
+      # The full public surface (including methods from included modules), minus Object's own.
+      v1_methods = Daytona::V1::Daytona.public_instance_methods - Object.public_instance_methods
+      root_methods = described_class.public_instance_methods - Object.public_instance_methods
 
-      missing_methods = v1_methods.reject { |method_name| root_methods.include?(method_name) }
-      expect(missing_methods).to eq([])
+      expect(v1_methods - root_methods).to eq([])
+      expect(root_methods - v1_methods).to eq([:v1])
     end
 
     it 'gives every root forwarder the same parameters as its v1 method' do
       v1 = Daytona::V1::Daytona
-      mismatched = v1.public_instance_methods(false).reject do |name|
+      mismatched = (v1.public_instance_methods - Object.public_instance_methods).reject do |name|
         v1_method = v1.uninstrumented_method(name) || v1.instance_method(name)
         v1_method.parameters == described_class.instance_method(name).parameters
       end
