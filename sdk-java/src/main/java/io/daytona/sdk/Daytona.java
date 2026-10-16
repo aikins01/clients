@@ -44,8 +44,7 @@ public class Daytona implements AutoCloseable {
     /**
      * Creates a root client using environment variables.
      *
-     * <p>Reads {@code DAYTONA_API_KEY} (or {@code DAYTONA_JWT_TOKEN} with
-     * {@code DAYTONA_ORGANIZATION_ID}), {@code DAYTONA_API_URL}, and the deprecated
+     * <p>Reads {@code DAYTONA_API_KEY}, {@code DAYTONA_API_URL}, and the deprecated
      * {@code DAYTONA_TARGET}.
      *
      * @throws DaytonaException if required authentication is missing
