@@ -34,8 +34,10 @@ config = DaytonaConfig(api_key="YOUR_API_KEY")
 daytona = Daytona(config).v1
 ```
 
-To keep code portable to SDK 2.x, do not pass `api_url` to the root `DaytonaConfig`: the 2.x
-root `DaytonaConfig` has no such field (passing it raises `TypeError`). The 2.x root client's
+To keep code portable to SDK 2.x, pass only `api_key`, `jwt_token`, `organization_id`, the
+deprecated `target`, `connection_pool_maxsize` and `otel_enabled` to the root `DaytonaConfig`. The
+2.x root `DaytonaConfig` has no `api_url`, `server_url`, `use_deprecated_polling` or `_experimental`
+(passing one raises `TypeError`). The 2.x root client's
 `.v1` uses `V1_API_URL`, overridable only with the `DAYTONA_V1_API_URL` environment variable (it
 does not read `DAYTONA_API_URL`). If you need a custom endpoint, build the v1 client directly with
 `from daytona.v1 import Daytona, DaytonaConfig`.

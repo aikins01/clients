@@ -1338,6 +1338,7 @@ func TestV1ClientMethodsDoNotWarn(t *testing.T) {
 	t.Cleanup(func() { SetDeprecationWarningWriter(nil) })
 
 	t.Setenv("DAYTONA_API_KEY", "test-api-key")
+	t.Setenv("DAYTONA_TARGET", "")
 
 	client, err := NewClient()
 	require.NoError(t, err)
@@ -1356,6 +1357,7 @@ func TestClientDeprecatedMethodsWarnOnce(t *testing.T) {
 	t.Cleanup(func() { SetDeprecationWarningWriter(nil) })
 
 	t.Setenv("DAYTONA_API_KEY", "test-api-key")
+	t.Setenv("DAYTONA_TARGET", "")
 
 	client, err := NewClient()
 	require.NoError(t, err)
@@ -1480,6 +1482,7 @@ func TestClientCloseDoesNotWarn(t *testing.T) {
 	t.Cleanup(func() { SetDeprecationWarningWriter(nil) })
 
 	t.Setenv("DAYTONA_API_KEY", "test-api-key")
+	t.Setenv("DAYTONA_TARGET", "")
 
 	client, err := NewClient()
 	require.NoError(t, err)
