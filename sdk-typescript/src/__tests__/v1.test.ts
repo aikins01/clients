@@ -100,6 +100,7 @@ describe('@daytona/sdk/v1 namespace', () => {
     expect(v1.DaytonaV1).toBe(ImplementationDaytona)
     expect(v1.ImageV1).toBe(v1.Image)
     expect(v1.SandboxV1).toBe(v1.Sandbox)
+    expect(v1.SandboxStateV1).toBe(v1.SandboxState)
     expect(typeAliasesMatch).toEqual([true, true, true, true])
     expect(root.V1_API_URL).toBe(V1_API_URL)
     expect(v1.V1_API_URL).toBe(V1_API_URL)

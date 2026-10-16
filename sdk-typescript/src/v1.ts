@@ -15,6 +15,19 @@ export type {
   VolumeMount as VolumeMountV1,
 } from './Daytona'
 export type { ListSandboxesQuery as ListSandboxesQueryV1 } from './Sandbox'
+// Names SDK 2.x also exports from `@daytona/sdk/v2`, so its bundle aliases them as `...V1` too.
+export type { FilePermissionsParams as FilePermissionsParamsV1 } from './FileSystem'
+export type { Secret as SecretV1 } from './Secret'
+export type { Snapshot as SnapshotV1 } from './Snapshot'
+export { SandboxState as SandboxStateV1 } from '@daytona/api-client'
+export type {
+  FileInfo as FileInfoV1,
+  GitStatus as GitStatusV1,
+  ListBranchResponse as ListBranchResponseV1,
+  Match as MatchV1,
+  ReplaceResult as ReplaceResultV1,
+  SearchFilesResponse as SearchFilesResponseV1,
+} from '@daytona/toolbox-api-client'
 export {
   DaytonaAuthenticationError,
   DaytonaAuthenticationError as DaytonaAuthenticationErrorV1,

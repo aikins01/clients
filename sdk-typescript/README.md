@@ -44,9 +44,8 @@ const daytona = new Daytona({
 To keep code portable to SDK 2.x, pass only `apiKey`, `jwtToken`, `organizationId`, the deprecated
 `target` and `otelEnabled` to the root `Daytona`. The 2.x root `DaytonaConfig` has no `apiUrl`,
 `serverUrl`, `useDeprecatedPolling`, `requestTimeoutMs` or `_experimental` (passing one is a type
-error). The 2.x root client's `.v1` uses
-`V1_API_URL`, overridable only with the `DAYTONA_V1_API_URL` environment variable (it does not read
-`DAYTONA_API_URL`). If you need a custom endpoint, create the v1 client directly with `Daytona` from
+error). The 2.x root client's `.v1` always uses
+`V1_API_URL` and does not read `DAYTONA_API_URL`. If you need a custom endpoint, create the v1 client directly with `Daytona` from
 `@daytona/sdk/v1`.
 
 ## Versioned namespace
