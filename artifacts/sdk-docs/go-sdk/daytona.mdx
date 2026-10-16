@@ -654,38 +654,7 @@ Close shuts down the client and releases resources. When OpenTelemetry is enable
 func (c *Client) Create(ctx context.Context, params any, opts ...func(*options.CreateSandbox)) (*Sandbox, error)
 ```
 
-Create creates a new sandbox with the specified parameters.
-
-The params argument accepts either \[types.SnapshotParams\] to create from a snapshot, or \[types.ImageParams\] to create from a Docker image \(a pointer to either is also accepted\). Pass nil to create a sandbox with default parameters:
-
-```
-// Create from a snapshot
-sandbox, err := client.Create(ctx, types.SnapshotParams{
-    Snapshot: "my-snapshot",
-    SandboxBaseParams: types.SandboxBaseParams{
-        Name: "my-sandbox",
-    },
-})
-
-// Create from a Docker image
-sandbox, err := client.Create(ctx, types.ImageParams{
-    Image: "python:3.11",
-    Resources: &types.Resources{
-        CPU:    2,
-        Memory: 4096,
-    },
-})
-```
-
-By default, Create waits for the sandbox to reach the started state before returning. Pass options.WithWaitForStart\(false\) \(see \[options.WithWaitForStart\]\) to return immediately after creation.
-
-Optional parameters can be configured using functional options:
-
-- \[options.WithTimeout\]: Set maximum wait time for creation
-- \[options.WithWaitForStart\]: Control whether to wait for started state
-- \[options.WithLogChannel\]: Receive build logs during image builds
-
-Returns the created [Sandbox](<#Sandbox>) or an error if creation fails.
+Create creates a new sandbox. It forwards to [V1Client.Create](<#V1Client.Create>); see there for the parameters, options and examples.
 
 Deprecated: Use client.V1\(\).Create instead. The root form is removed in SDK 2.x.
 
@@ -696,21 +665,7 @@ Deprecated: Use client.V1\(\).Create instead. The root form is removed in SDK 2.
 func (c *Client) Get(ctx context.Context, sandboxIDOrName string) (*Sandbox, error)
 ```
 
-Get retrieves an existing sandbox by its ID or name.
-
-The sandboxIDOrName parameter accepts either the sandbox's unique ID or its human\-readable name. If a sandbox with the given identifier is not found, a [\\\*github.com/daytona/clients/sdk\\\-go/pkg/errors.DaytonaError](<https://pkg.go.dev/github.com/daytona/clients/sdk-go/pkg/errors/#DaytonaError>) matching [github.com/daytona/clients/sdk\\\-go/pkg/errors.ErrNotFound](<https://pkg.go.dev/github.com/daytona/clients/sdk-go/pkg/errors/#ErrNotFound>) is returned.
-
-Example:
-
-```
-sandbox, err := client.Get(ctx, "my-sandbox")
-if err != nil {
-    if errors.Is(err, sdkerrors.ErrNotFound) {
-        log.Println("Sandbox not found")
-    }
-    return err
-}
-```
+Get retrieves a sandbox by ID or name. It forwards to [V1Client.Get](<#V1Client.Get>); see there for the error behaviour and an example.
 
 Deprecated: Use client.V1\(\).Get instead. The root form is removed in SDK 2.x.
 
