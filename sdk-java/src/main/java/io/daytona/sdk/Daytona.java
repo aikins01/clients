@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 /**
  * Root Daytona client wrapper for the Daytona 1.x SDK.
  *
- * <p>Use {@link #v1()} for Daytona 2.x-compatible call sites. Deprecated root resource methods
+ * <p>Use {@code daytona.v1()} for Daytona 2.x-compatible call sites. Deprecated root resource methods
  * forward to the same {@link DaytonaV1} instance and emit a runtime warning once per process.
  *
  * @see DaytonaV1
