@@ -200,7 +200,7 @@ func (c *V1Client) ListSeq(ctx context.Context, query *ListSandboxesQuery) iter.
 // Deprecated: Use client.V1().List instead. The root form is removed in SDK 2.x.
 func (c *Client) List(ctx context.Context, query *ListSandboxesQuery) *SandboxIterator {
 	warnDeprecatedRootMember("List")
-	return c.list(ctx, query)
+	return c.V1().List(ctx, query)
 }
 
 // ListSeq returns a Go 1.23+ range-over-func iterator over Sandboxes matching
@@ -220,5 +220,5 @@ func (c *Client) List(ctx context.Context, query *ListSandboxesQuery) *SandboxIt
 // Deprecated: Use client.V1().ListSeq instead. The root form is removed in SDK 2.x.
 func (c *Client) ListSeq(ctx context.Context, query *ListSandboxesQuery) iter.Seq2[*Sandbox, error] {
 	warnDeprecatedRootMember("ListSeq")
-	return c.listSeq(ctx, query)
+	return c.V1().ListSeq(ctx, query)
 }

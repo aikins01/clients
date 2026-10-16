@@ -21,7 +21,7 @@
 //   - DAYTONA_API_KEY: API key for authentication
 //   - DAYTONA_JWT_TOKEN: JWT token for authentication (alternative to API key)
 //   - DAYTONA_ORGANIZATION_ID: Organization ID (required when using JWT token)
-//   - DAYTONA_API_URL: API URL (defaults to V1APIURL)
+//   - DAYTONA_API_URL: API URL (defaults to https://app.daytona.io/api, [V1APIURL])
 //   - DAYTONA_TARGET: Deprecated default region for sandboxes and snapshots (a per-call Target / RegionID overrides it)
 //
 // Or provide configuration explicitly:
@@ -443,9 +443,7 @@ func (c *Client) createToolboxClient(proxyURL string, sandboxID string) (*toolbo
 // Deprecated: Use client.V1().Create instead. The root form is removed in SDK 2.x.
 func (c *Client) Create(ctx context.Context, params any, opts ...func(*options.CreateSandbox)) (*Sandbox, error) {
 	warnDeprecatedRootMember("Create")
-	return withInstrumentation(ctx, c.Otel, "Client", "Create", func(ctx context.Context) (*Sandbox, error) {
-		return c.doCreate(ctx, params, opts...)
-	})
+	return c.V1().Create(ctx, params, opts...)
 }
 
 func (c *Client) doCreate(ctx context.Context, params any, opts ...func(*options.CreateSandbox)) (*Sandbox, error) {
@@ -750,9 +748,7 @@ func (c *Client) doCreate(ctx context.Context, params any, opts ...func(*options
 // Deprecated: Use client.V1().Get instead. The root form is removed in SDK 2.x.
 func (c *Client) Get(ctx context.Context, sandboxIDOrName string) (*Sandbox, error) {
 	warnDeprecatedRootMember("Get")
-	return withInstrumentation(ctx, c.Otel, "Client", "Get", func(ctx context.Context) (*Sandbox, error) {
-		return c.doGet(ctx, sandboxIDOrName)
-	})
+	return c.V1().Get(ctx, sandboxIDOrName)
 }
 
 func (c *Client) doGet(ctx context.Context, sandboxIDOrName string) (*Sandbox, error) {
