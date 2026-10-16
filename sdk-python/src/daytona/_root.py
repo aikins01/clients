@@ -89,11 +89,23 @@ class Daytona:
         warn_root_namespace_once("volume")
         return self.v1.volume
 
+    @volume.setter
+    @deprecated("Use `daytona.v1.volume` instead. The root form is removed in SDK 2.x.", category=None)
+    def volume(self, value: VolumeService) -> None:
+        warn_root_namespace_once("volume")
+        self.v1.volume = value
+
     @property
     @deprecated("Use `daytona.v1.snapshot` instead. The root form is removed in SDK 2.x.", category=None)
     def snapshot(self) -> SnapshotService:
         warn_root_namespace_once("snapshot")
         return self.v1.snapshot
+
+    @snapshot.setter
+    @deprecated("Use `daytona.v1.snapshot` instead. The root form is removed in SDK 2.x.", category=None)
+    def snapshot(self, value: SnapshotService) -> None:
+        warn_root_namespace_once("snapshot")
+        self.v1.snapshot = value
 
     @property
     @deprecated("Use `daytona.v1.secret` instead. The root form is removed in SDK 2.x.", category=None)
@@ -101,11 +113,23 @@ class Daytona:
         warn_root_namespace_once("secret")
         return self.v1.secret
 
+    @secret.setter
+    @deprecated("Use `daytona.v1.secret` instead. The root form is removed in SDK 2.x.", category=None)
+    def secret(self, value: SecretService) -> None:
+        warn_root_namespace_once("secret")
+        self.v1.secret = value
+
     @property
     @deprecated("Use `daytona.v1.warm_pool` instead. The root form is removed in SDK 2.x.", category=None)
     def warm_pool(self) -> WarmPoolService:
         warn_root_namespace_once("warm_pool")
         return self.v1.warm_pool
+
+    @warm_pool.setter
+    @deprecated("Use `daytona.v1.warm_pool` instead. The root form is removed in SDK 2.x.", category=None)
+    def warm_pool(self, value: WarmPoolService) -> None:
+        warn_root_namespace_once("warm_pool")
+        self.v1.warm_pool = value
 
     @overload
     @deprecated("Use `daytona.v1.create` instead. The root form is removed in SDK 2.x.", category=None)
@@ -229,11 +253,23 @@ class AsyncDaytona:
         warn_root_namespace_once("volume")
         return self.v1.volume
 
+    @volume.setter
+    @deprecated("Use `daytona.v1.volume` instead. The root form is removed in SDK 2.x.", category=None)
+    def volume(self, value: AsyncVolumeService) -> None:
+        warn_root_namespace_once("volume")
+        self.v1.volume = value
+
     @property
     @deprecated("Use `daytona.v1.snapshot` instead. The root form is removed in SDK 2.x.", category=None)
     def snapshot(self) -> AsyncSnapshotService:
         warn_root_namespace_once("snapshot")
         return self.v1.snapshot
+
+    @snapshot.setter
+    @deprecated("Use `daytona.v1.snapshot` instead. The root form is removed in SDK 2.x.", category=None)
+    def snapshot(self, value: AsyncSnapshotService) -> None:
+        warn_root_namespace_once("snapshot")
+        self.v1.snapshot = value
 
     @property
     @deprecated("Use `daytona.v1.secret` instead. The root form is removed in SDK 2.x.", category=None)
@@ -241,11 +277,23 @@ class AsyncDaytona:
         warn_root_namespace_once("secret")
         return self.v1.secret
 
+    @secret.setter
+    @deprecated("Use `daytona.v1.secret` instead. The root form is removed in SDK 2.x.", category=None)
+    def secret(self, value: AsyncSecretService) -> None:
+        warn_root_namespace_once("secret")
+        self.v1.secret = value
+
     @property
     @deprecated("Use `daytona.v1.warm_pool` instead. The root form is removed in SDK 2.x.", category=None)
     def warm_pool(self) -> AsyncWarmPoolService:
         warn_root_namespace_once("warm_pool")
         return self.v1.warm_pool
+
+    @warm_pool.setter
+    @deprecated("Use `daytona.v1.warm_pool` instead. The root form is removed in SDK 2.x.", category=None)
+    def warm_pool(self, value: AsyncWarmPoolService) -> None:
+        warn_root_namespace_once("warm_pool")
+        self.v1.warm_pool = value
 
     @overload
     @deprecated("Use `daytona.v1.create` instead. The root form is removed in SDK 2.x.", category=None)

@@ -175,6 +175,22 @@ class TestRootDaytonaWrapper:
 
         assert v1_client.default_language == CodeLanguage.TYPESCRIPT
 
+    def test_root_service_setters_forward_to_v1(self):
+        v1_client = MagicMock()
+
+        with patch("daytona._root._DaytonaV1", return_value=v1_client):
+            client = daytona.Daytona(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
+
+        replacements = {name: MagicMock() for name in ("volume", "snapshot", "secret", "warm_pool")}
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            for name, value in replacements.items():
+                setattr(client, name, value)
+
+        for name, value in replacements.items():
+            assert getattr(v1_client, name) is value
+        assert len([w for w in caught if issubclass(w.category, DeprecationWarning)]) == 1
+
     def test_root_warning_is_attributed_to_the_caller(self):
         v1_client = MagicMock()
 
