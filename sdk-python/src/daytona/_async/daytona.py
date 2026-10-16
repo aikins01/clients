@@ -135,7 +135,7 @@ class AsyncDaytona:
 
         Using explicit configuration:
         ```python
-        from daytona.v1 import CreateSandboxFromSnapshotParams, DaytonaConfig
+        from daytona.v1 import AsyncDaytona, CreateSandboxFromSnapshotParams, DaytonaConfig
 
         config = DaytonaConfig(
             api_key="your-api-key",

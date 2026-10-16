@@ -90,7 +90,7 @@ class Daytona:
 
         Using explicit configuration:
         ```python
-        from daytona.v1 import CreateSandboxFromSnapshotParams, DaytonaConfig
+        from daytona.v1 import CreateSandboxFromSnapshotParams, Daytona, DaytonaConfig
 
         config = DaytonaConfig(
             api_key="your-api-key",
@@ -106,7 +106,7 @@ class Daytona:
             api_key="your-api-key",
             experimental={"otelEnabled": True}  # Enable OpenTelemetry tracing through experimental config
         )
-        async with Daytona(config) as daytona:
+        with Daytona(config) as daytona:
             sandbox = daytona.create()
             # All SDK operations will be traced
         # OpenTelemetry traces are flushed on close
