@@ -175,22 +175,6 @@ class TestRootDaytonaWrapper:
 
         assert v1_client.default_language == CodeLanguage.TYPESCRIPT
 
-    def test_root_service_setters_forward_to_v1(self):
-        v1_client = MagicMock()
-
-        with patch("daytona._root._DaytonaV1", return_value=v1_client):
-            client = daytona.Daytona(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
-
-        replacements = {name: MagicMock() for name in ("volume", "snapshot", "secret", "warm_pool")}
-        with warnings.catch_warnings(record=True) as caught:
-            warnings.simplefilter("always")
-            for name, value in replacements.items():
-                setattr(client, name, value)
-
-        for name, value in replacements.items():
-            assert getattr(v1_client, name) is value
-        assert len([w for w in caught if issubclass(w.category, DeprecationWarning)]) == 1
-
     def test_root_warning_is_attributed_to_the_caller(self):
         v1_client = MagicMock()
 
@@ -312,6 +296,26 @@ class TestRootAsyncDaytonaWrapper:
             missing_members = [name for name in _public_v1_members(root_client.v1) if not hasattr(root_client, name)]
 
         assert missing_members == []
+
+
+@pytest.mark.parametrize(
+    ("root_cls", "v1_patch_target"), [(daytona.Daytona, "_DaytonaV1"), (daytona.AsyncDaytona, "_AsyncDaytonaV1")]
+)
+def test_root_service_setters_forward_to_v1(root_cls: type, v1_patch_target: str):
+    v1_client = MagicMock()
+
+    with patch(f"daytona._root.{v1_patch_target}", return_value=v1_client):
+        client = root_cls(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
+
+    replacements = {name: MagicMock() for name in ("volume", "snapshot", "secret", "warm_pool")}
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        for name, value in replacements.items():
+            setattr(client, name, value)
+
+    for name, value in replacements.items():
+        assert getattr(v1_client, name) is value
+    assert len([w for w in caught if issubclass(w.category, DeprecationWarning)]) == 1
 
 
 @pytest.mark.parametrize(
