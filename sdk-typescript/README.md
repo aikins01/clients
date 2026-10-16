@@ -41,11 +41,11 @@ const daytona = new Daytona({
 });
 ```
 
-To keep code portable to SDK 2.x, pass only `apiKey`, `jwtToken` and `organizationId` to the
-root `Daytona`. A custom API URL is not portable through the root client: in SDK 2.x the root
-client's `.v1` always uses `V1_API_URL` and ignores both `apiUrl` and the `DAYTONA_API_URL`
-environment variable (2.x reads `DAYTONA_V1_API_URL` there instead). If you need a custom endpoint,
-create the v1 client directly with `Daytona` from `@daytona/sdk/v1`.
+To keep code portable to SDK 2.x, do not pass `apiUrl` to the root `Daytona`: the 2.x root
+`DaytonaConfig` has no such field (passing it is a type error). The 2.x root client's `.v1` uses
+`V1_API_URL`, overridable only with the `DAYTONA_V1_API_URL` environment variable (it does not read
+`DAYTONA_API_URL`). If you need a custom endpoint, create the v1 client directly with `Daytona` from
+`@daytona/sdk/v1`.
 
 ## Versioned namespace
 

@@ -108,6 +108,20 @@ class DaytonaWrapperTest {
     }
 
     @Test
+    void closeForwardsToDelegateWithoutWarning() {
+        DaytonaV1 delegate = Mockito.mock(DaytonaV1.class);
+
+        TestSupport.withLogCapture(Logger.getLogger(Daytona.class.getName()), records -> {
+            Daytona.resetRootNamespaceWarningForTests();
+            new Daytona(delegate).close();
+            assertThat(records).isEmpty();
+        });
+
+        Mockito.verify(delegate).close();
+        Mockito.verifyNoMoreInteractions(delegate);
+    }
+
+    @Test
     void rootWrapperExposesEveryPublicV1MethodWithSameSignature() {
         Set<String> wrapperMethods = Arrays.stream(Daytona.class.getMethods())
                 .map(DaytonaWrapperTest::methodSignature)

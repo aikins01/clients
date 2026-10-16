@@ -25,6 +25,7 @@ const stopMock = jest.fn(async () => undefined)
 const forkMock = jest.fn(async () => 'forked')
 const experimentalForkMock = jest.fn(async () => 'experimental-forked')
 const deleteMock = jest.fn(async () => undefined)
+const disposeMock = jest.fn(async () => undefined)
 const createAxiosInstanceMock = jest.fn(() => ({ mocked: true }))
 const volumeService = { kind: 'volume-service' }
 const snapshotService = { kind: 'snapshot-service' }
@@ -48,7 +49,7 @@ jest.mock('../Daytona', () => {
     public fork = forkMock
     public _experimental_fork = experimentalForkMock
     public delete = deleteMock
-    public [Symbol.asyncDispose] = jest.fn(async () => undefined)
+    public [Symbol.asyncDispose] = disposeMock
 
     public static createAxiosInstance = createAxiosInstanceMock
   }
@@ -185,6 +186,21 @@ describe('@daytona/sdk/v1 namespace', () => {
     expect(experimentalForkMock).toHaveBeenCalledWith(sandbox, { name: 'copy' }, 9)
     await root.delete(sandbox, 30, true)
     expect(deleteMock).toHaveBeenCalledWith(sandbox, 30, true)
+
+    emitWarningSpy.mockRestore()
+  })
+
+  it('closes and disposes the v1 client without a deprecation warning', async () => {
+    const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
+    const { Daytona } = await import('../index')
+
+    await new Daytona({ apiKey: 'api-key' }).close()
+    expect(disposeMock).toHaveBeenCalledTimes(1)
+    {
+      await using _root = new Daytona({ apiKey: 'api-key' })
+    }
+    expect(disposeMock).toHaveBeenCalledTimes(2)
+    expect(emitWarningSpy).not.toHaveBeenCalled()
 
     emitWarningSpy.mockRestore()
   })

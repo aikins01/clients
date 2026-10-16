@@ -1428,7 +1428,50 @@ func TestClientDeprecatedMethodsForwardToV1(t *testing.T) {
 	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
 }
 
-func TestTargetDeprecationWarnsOnce(t *testing.T) {
+func TestTargetDeprecationWarnsOnceForConfig(t *testing.T) {
+	resetDeprecationWarningsForTests()
+	t.Cleanup(resetDeprecationWarningsForTests)
+
+	var stderr bytes.Buffer
+	SetDeprecationWarningWriter(&stderr)
+	t.Cleanup(func() { SetDeprecationWarningWriter(nil) })
+
+	t.Setenv("DAYTONA_API_KEY", "test-api-key")
+	t.Setenv("DAYTONA_TARGET", "")
+
+	for range 2 {
+		//nolint:staticcheck // exercises the deprecated config field until removal.
+		_, err := NewClientWithConfig(&types.DaytonaConfig{APIKey: "test-api-key", Target: "eu"})
+		require.NoError(t, err)
+	}
+
+	warning := stderr.String()
+	assert.Contains(t, warning, "DaytonaConfig.Target (and DAYTONA_TARGET) is deprecated")
+	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
+}
+
+func TestTargetDeprecationWarnsOnceForEnv(t *testing.T) {
+	resetDeprecationWarningsForTests()
+	t.Cleanup(resetDeprecationWarningsForTests)
+
+	var stderr bytes.Buffer
+	SetDeprecationWarningWriter(&stderr)
+	t.Cleanup(func() { SetDeprecationWarningWriter(nil) })
+
+	t.Setenv("DAYTONA_API_KEY", "test-api-key")
+	t.Setenv("DAYTONA_TARGET", "us")
+
+	for range 2 {
+		_, err := NewClient()
+		require.NoError(t, err)
+	}
+
+	warning := stderr.String()
+	assert.Contains(t, warning, "DaytonaConfig.Target (and DAYTONA_TARGET) is deprecated")
+	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
+}
+
+func TestClientCloseDoesNotWarn(t *testing.T) {
 	resetDeprecationWarningsForTests()
 	t.Cleanup(resetDeprecationWarningsForTests)
 
@@ -1438,17 +1481,10 @@ func TestTargetDeprecationWarnsOnce(t *testing.T) {
 
 	t.Setenv("DAYTONA_API_KEY", "test-api-key")
 
-	//nolint:staticcheck // exercises the deprecated config field until removal.
-	_, err := NewClientWithConfig(&types.DaytonaConfig{APIKey: "test-api-key", Target: "eu"})
+	client, err := NewClient()
 	require.NoError(t, err)
-
-	t.Setenv("DAYTONA_TARGET", "us")
-	_, err = NewClient()
-	require.NoError(t, err)
-
-	warning := stderr.String()
-	assert.Contains(t, warning, "DaytonaConfig.Target (and DAYTONA_TARGET) is deprecated")
-	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
+	require.NoError(t, client.Close(context.Background()))
+	assert.Empty(t, stderr.String())
 }
 
 func TestV1ClientConcurrentFirstAccessReturnsOneInstance(t *testing.T) {

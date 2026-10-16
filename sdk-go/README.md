@@ -346,7 +346,6 @@ for _, vol := range volumes {
 
 // sandboxes — pull iterator (all Go versions)
 iter := client.V1().List(ctx, nil)
-defer iter.Close()
 for iter.Next() {
     fmt.Println(iter.Value().ID)
 }
