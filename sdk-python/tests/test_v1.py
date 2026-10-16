@@ -106,7 +106,7 @@ class TestRootDaytonaWrapper:
     def test_v1_property_returns_same_sync_instance(self):
         v1_client = MagicMock()
 
-        with patch("daytona._root._DaytonaV1", return_value=v1_client):
+        with patch("daytona._root_sync._DaytonaV1", return_value=v1_client):
             client = daytona.Daytona(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
 
         assert client.v1 is v1_client
@@ -117,7 +117,7 @@ class TestRootDaytonaWrapper:
         v1_client = MagicMock()
         v1_client.close = AsyncMock()
 
-        with patch("daytona._root._AsyncDaytonaV1", return_value=v1_client):
+        with patch("daytona._root_async._AsyncDaytonaV1", return_value=v1_client):
             client = daytona.AsyncDaytona(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
 
         assert client.v1 is v1_client
@@ -141,7 +141,7 @@ class TestRootDaytonaWrapper:
         v1_client.secret = secret_service
         v1_client.warm_pool = warm_pool_service
 
-        with patch("daytona._root._DaytonaV1", return_value=v1_client):
+        with patch("daytona._root_sync._DaytonaV1", return_value=v1_client):
             client = daytona.Daytona(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
 
         with warnings.catch_warnings(record=True) as caught:
@@ -170,7 +170,7 @@ class TestRootDaytonaWrapper:
     def test_root_default_language_setter_forwards_to_v1(self):
         v1_client = MagicMock()
 
-        with patch("daytona._root._DaytonaV1", return_value=v1_client):
+        with patch("daytona._root_sync._DaytonaV1", return_value=v1_client):
             client = daytona.Daytona(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
 
         with warnings.catch_warnings():
@@ -182,7 +182,7 @@ class TestRootDaytonaWrapper:
     def test_root_warning_is_attributed_to_the_caller(self):
         v1_client = MagicMock()
 
-        with patch("daytona._root._DaytonaV1", return_value=v1_client):
+        with patch("daytona._root_sync._DaytonaV1", return_value=v1_client):
             client = daytona.Daytona(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
 
         with warnings.catch_warnings(record=True) as caught:
@@ -194,7 +194,7 @@ class TestRootDaytonaWrapper:
     def test_v1_usage_does_not_warn(self):
         v1_client = MagicMock()
 
-        with patch("daytona._root._DaytonaV1", return_value=v1_client):
+        with patch("daytona._root_sync._DaytonaV1", return_value=v1_client):
             client = daytona.Daytona(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
 
         with warnings.catch_warnings(record=True) as caught:
@@ -270,7 +270,7 @@ class TestRootAsyncDaytonaWrapper:
         v1_client.list.return_value = sandboxes
         v1_client.close = AsyncMock()
 
-        with patch("daytona._root._AsyncDaytonaV1", return_value=v1_client):
+        with patch("daytona._root_async._AsyncDaytonaV1", return_value=v1_client):
             client = daytona.AsyncDaytona(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
 
         with warnings.catch_warnings(record=True) as caught:
@@ -303,12 +303,13 @@ class TestRootAsyncDaytonaWrapper:
 
 
 @pytest.mark.parametrize(
-    ("root_cls", "v1_patch_target"), [(daytona.Daytona, "_DaytonaV1"), (daytona.AsyncDaytona, "_AsyncDaytonaV1")]
+    ("root_cls", "v1_patch_module", "v1_patch_target"),
+    [(daytona.Daytona, "_root_sync", "_DaytonaV1"), (daytona.AsyncDaytona, "_root_async", "_AsyncDaytonaV1")],
 )
-def test_root_service_setters_forward_to_v1(root_cls: type, v1_patch_target: str):
+def test_root_service_setters_forward_to_v1(root_cls: type, v1_patch_module: str, v1_patch_target: str):
     v1_client = MagicMock()
 
-    with patch(f"daytona._root.{v1_patch_target}", return_value=v1_client):
+    with patch(f"daytona.{v1_patch_module}.{v1_patch_target}", return_value=v1_client):
         client = root_cls(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
 
     replacements = {name: MagicMock() for name in ("volume", "snapshot", "secret", "warm_pool")}
@@ -360,6 +361,13 @@ class TestTargetDeprecation:
             assert config.target == "eu"
 
         assert [warning.filename for warning in caught if "DaytonaConfig.target" in str(warning.message)] == [__file__]
+
+    def test_warnings_raise_on_every_call_when_turned_into_errors(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", DeprecationWarning)
+            for _ in range(2):
+                with pytest.raises(DeprecationWarning):
+                    DaytonaConfig(api_key="test-key", api_url="https://api.test.io", target="us")
 
     def test_target_warning_is_attributed_to_the_caller(self):
         with warnings.catch_warnings(record=True) as caught:
@@ -474,6 +482,21 @@ class TestV1NamespaceExports:
             env={**os.environ, "PYTHONPATH": str(src_dir)},
         )
         assert result.returncode == 0, result.stdout + result.stderr
+
+    def test_sync_root_import_does_not_load_the_async_client(self):
+        code = (
+            "import sys; from daytona import Daytona; "
+            "print(any(name.startswith('daytona._async') for name in sys.modules))"
+        )
+        src_dir = Path(daytona.__file__).resolve().parent.parent
+        result = subprocess.run(
+            [sys.executable, "-c", code],
+            capture_output=True,
+            text=True,
+            check=True,
+            env={**os.environ, "PYTHONPATH": str(src_dir)},
+        )
+        assert result.stdout.strip() == "False"
 
     def test_v1_api_url_is_exported(self):
         assert V1_API_URL == "https://app.daytona.io/api"

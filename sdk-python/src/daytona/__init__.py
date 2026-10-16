@@ -25,7 +25,8 @@ if TYPE_CHECKING:
     from . import v1 as v1
     from ._async.computer_use import AsyncComputerUse, AsyncDisplay, AsyncKeyboard, AsyncMouse, AsyncScreenshot
     from ._async.sandbox import AsyncSandbox
-    from ._root import AsyncDaytona, Daytona
+    from ._root_async import AsyncDaytona
+    from ._root_sync import Daytona
     from ._sync.sandbox import Sandbox
     from .common.charts import (
         BarChart,
@@ -224,9 +225,9 @@ _EXTERNAL_IMPORTS: dict[str, tuple[str, str]] = {
 }
 
 _DYNAMIC_IMPORTS: dict[str, str] = {
-    "Daytona": "_root",
+    "Daytona": "_root_sync",
     "Sandbox": "_sync.sandbox",
-    "AsyncDaytona": "_root",
+    "AsyncDaytona": "_root_async",
     "AsyncSandbox": "_async.sandbox",
     "AsyncComputerUse": "_async.computer_use",
     "AsyncMouse": "_async.computer_use",
