@@ -58,8 +58,8 @@ public final class DaytonaConfig {
      * overrides it.
      *
      * @return target region identifier, or {@code null} if not configured
-     * @deprecated DaytonaConfig.target (and DAYTONA_TARGET) is deprecated and will be removed in a
-     *     future version. Pass target per sandbox create or regionId per snapshot create instead.
+     * @deprecated {@code getTarget()} (and {@code DAYTONA_TARGET}) is deprecated and will be removed
+     *     in a future version. Pass target per sandbox create or regionId per snapshot create instead.
      */
     @Deprecated(since = "1.0")
     public String getTarget() {
@@ -130,9 +130,9 @@ public final class DaytonaConfig {
          *
          * @param target target location identifier
          * @return this builder instance
-         * @deprecated DaytonaConfig.target (and DAYTONA_TARGET) is deprecated and will be removed
-         *     in a future version. Pass target per sandbox create or regionId per snapshot create
-         *     instead.
+         * @deprecated {@code Builder.target(String)} (and {@code DAYTONA_TARGET}) is deprecated and
+         *     will be removed in a future version. Pass target per sandbox create or regionId per
+         *     snapshot create instead.
          */
         @Deprecated(since = "1.0")
         public Builder target(String target) {

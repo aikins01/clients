@@ -90,6 +90,8 @@ class Daytona:
 
         Using explicit configuration:
         ```python
+        from daytona.v1 import CreateSandboxFromSnapshotParams, DaytonaConfig
+
         config = DaytonaConfig(
             api_key="your-api-key",
             api_url="https://your-api.com",

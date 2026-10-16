@@ -36,6 +36,8 @@ async with AsyncDaytona() as daytona:  # Uses DAYTONA_API_KEY, DAYTONA_API_URL
   
   Using explicit configuration:
 ```python
+from daytona.v1 import CreateSandboxFromSnapshotParams, DaytonaConfig
+
 config = DaytonaConfig(
     api_key="your-api-key",
     api_url="https://your-api.com",

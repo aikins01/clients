@@ -1490,6 +1490,39 @@ func TestClientCloseDoesNotWarn(t *testing.T) {
 	assert.Empty(t, stderr.String())
 }
 
+func TestRootServiceFieldsReachTheAPI(t *testing.T) {
+	var paths []string
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		paths = append(paths, r.URL.Path)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"message":"boom"}`))
+	}))
+	defer server.Close()
+
+	client := createTestClientWithServer(t, server)
+	ctx := context.Background()
+
+	//nolint:staticcheck // exercises the deprecated root service fields.
+	_, err := client.Snapshot.List(ctx, nil, nil)
+	require.Error(t, err)
+	//nolint:staticcheck // exercises the deprecated root service fields.
+	_, err = client.Volume.List(ctx)
+	require.Error(t, err)
+	//nolint:staticcheck // exercises the deprecated root service fields.
+	_, err = client.Secret.List(ctx, nil)
+	require.Error(t, err)
+	//nolint:staticcheck // exercises the deprecated root service fields.
+	_, err = client.WarmPool.List(ctx)
+	require.Error(t, err)
+
+	require.Len(t, paths, 4)
+	assert.Contains(t, paths[0], "snapshot")
+	assert.Contains(t, paths[1], "volume")
+	assert.Contains(t, paths[2], "secret")
+	assert.Contains(t, paths[3], "warm")
+}
+
 func TestRootServiceFieldsShareServicesAtConstructionOnly(t *testing.T) {
 	t.Setenv("DAYTONA_API_KEY", "test-api-key")
 	t.Setenv("DAYTONA_TARGET", "")

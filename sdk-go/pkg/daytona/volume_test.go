@@ -66,6 +66,11 @@ func createTestClientWithServer(t *testing.T, server *httptest.Server) *Client {
 	snapshotService := NewSnapshotService(client)
 	secretService := NewSecretService(client)
 	warmPoolService := NewWarmPoolService(client)
+	// Mirror NewClientWithConfig: the deprecated root fields share the v1 services.
+	client.Volume = volumeService     //nolint:staticcheck // test helper sets the deprecated root fields.
+	client.Snapshot = snapshotService //nolint:staticcheck // test helper sets the deprecated root fields.
+	client.Secret = secretService     //nolint:staticcheck // test helper sets the deprecated root fields.
+	client.WarmPool = warmPoolService //nolint:staticcheck // test helper sets the deprecated root fields.
 	client.v1 = &V1Client{
 		client:   client,
 		Otel:     nil,

@@ -107,6 +107,22 @@ class DaytonaConfigTest {
 
     @SuppressWarnings("deprecation")
     @Test
+    void rootDaytonaConstructorReadsEnvironmentVariables() throws Exception {
+        Map<String, String> env = new HashMap<String, String>();
+        env.put("DAYTONA_API_KEY", "env-key");
+        env.put("DAYTONA_API_URL", "https://env.example/api/");
+
+        TestSupport.withEnvironment(env, () -> {
+            try (Daytona daytona = new Daytona()) {
+                DaytonaConfig config = TestSupport.getField(daytona.v1(), "config", DaytonaConfig.class);
+                assertThat(config.getApiKey()).isEqualTo("env-key");
+                assertThat(config.getApiUrl()).isEqualTo("https://env.example/api/");
+            }
+        });
+    }
+
+    @SuppressWarnings("deprecation")
+    @Test
     void defaultDaytonaConstructorReadsEnvironmentVariables() throws Exception {
         Map<String, String> env = new HashMap<String, String>();
         env.put("DAYTONA_API_KEY", "env-key");
