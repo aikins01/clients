@@ -25,6 +25,14 @@ public Daytona()
 
 Creates a root client using environment variables.
 
+Reads `DAYTONA_API_KEY` (or `DAYTONA_JWT_TOKEN` with
+`DAYTONA_ORGANIZATION_ID`), `DAYTONA_API_URL`, and the deprecated
+`DAYTONA_TARGET`.
+
+**Throws**:
+
+- `DaytonaException` - if required authentication is missing
+
 #### new Daytona()
 ```java
 public Daytona(DaytonaConfig config)
@@ -35,6 +43,10 @@ Creates a root client with explicit configuration.
 **Parameters**:
 
 - `config` _DaytonaConfig_ - SDK configuration containing API key and endpoint settings
+
+**Throws**:
+
+- `DaytonaException` - if configuration is invalid or missing credentials
 
 ### Methods
 

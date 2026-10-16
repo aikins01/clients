@@ -430,7 +430,8 @@ func (c *Client) createToolboxClient(proxyURL string, sandboxID string) (*toolbo
 // Create creates a new sandbox with the specified parameters.
 //
 // The params argument accepts either [types.SnapshotParams] to create from a snapshot,
-// or [types.ImageParams] to create from a Docker image (a pointer to either is also accepted):
+// or [types.ImageParams] to create from a Docker image (a pointer to either is also accepted).
+// Pass nil to create a sandbox with default parameters:
 //
 //	// Create from a snapshot
 //	sandbox, err := client.Create(ctx, types.SnapshotParams{
