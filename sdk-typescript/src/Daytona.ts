@@ -544,6 +544,13 @@ export class Daytona implements AsyncDisposable {
     })
   }
 
+  /**
+   * Closes the client: stops event streaming and flushes OpenTelemetry traces. Same as `await using`.
+   */
+  public async close(): Promise<void> {
+    return this[Symbol.asyncDispose]()
+  }
+
   async [Symbol.asyncDispose](): Promise<void> {
     this.eventSubscriptionManager.shutdown()
     this.eventDispatcher?.disconnect()

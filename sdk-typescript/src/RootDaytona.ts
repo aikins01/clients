@@ -40,7 +40,7 @@ export class Daytona implements AsyncDisposable {
 
   /** Closes the v1 client. Not deprecated. */
   public close(): Promise<void> {
-    return this.client[Symbol.asyncDispose]()
+    return this.client.close()
   }
 
   /** Closes the v1 client, for `await using`. Not deprecated. */

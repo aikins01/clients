@@ -26,6 +26,7 @@ const forkMock = jest.fn(async () => 'forked')
 const experimentalForkMock = jest.fn(async () => 'experimental-forked')
 const deleteMock = jest.fn(async () => undefined)
 const disposeMock = jest.fn(async () => undefined)
+const closeMock = jest.fn(async () => undefined)
 const createAxiosInstanceMock = jest.fn(() => ({ mocked: true }))
 const volumeService = { kind: 'volume-service' }
 const snapshotService = { kind: 'snapshot-service' }
@@ -50,6 +51,7 @@ jest.mock('../Daytona', () => {
     public _experimental_fork = experimentalForkMock
     public delete = deleteMock
     public [Symbol.asyncDispose] = disposeMock
+    public close = closeMock
 
     public static createAxiosInstance = createAxiosInstanceMock
   }
@@ -195,14 +197,26 @@ describe('@daytona/sdk/v1 namespace', () => {
     const { Daytona } = await import('../index')
 
     await new Daytona({ apiKey: 'api-key' }).close()
-    expect(disposeMock).toHaveBeenCalledTimes(1)
+    expect(closeMock).toHaveBeenCalledTimes(1)
     {
       await using _root = new Daytona({ apiKey: 'api-key' })
     }
-    expect(disposeMock).toHaveBeenCalledTimes(2)
+    expect(closeMock).toHaveBeenCalledTimes(2)
+    await new Daytona({ apiKey: 'api-key' }).v1.close()
+    expect(closeMock).toHaveBeenCalledTimes(3)
     expect(emitWarningSpy).not.toHaveBeenCalled()
 
     emitWarningSpy.mockRestore()
+  })
+
+  it('gives the real v1 client a close() that runs its dispose', async () => {
+    const { Daytona: DaytonaImpl } = jest.requireActual<typeof import('../Daytona')>('../Daytona')
+    const dispose = jest.spyOn(DaytonaImpl.prototype, Symbol.asyncDispose).mockResolvedValue(undefined)
+
+    await DaytonaImpl.prototype.close.call({ [Symbol.asyncDispose]: DaytonaImpl.prototype[Symbol.asyncDispose] })
+    expect(dispose).toHaveBeenCalledTimes(1)
+
+    dispose.mockRestore()
   })
 
   it('forwards static members to the implementation class', async () => {

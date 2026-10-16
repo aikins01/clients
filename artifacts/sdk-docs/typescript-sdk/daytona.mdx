@@ -125,6 +125,18 @@ asyncDispose: Promise<void>;
 AsyncDisposable.[asyncDispose]
 ```
 
+#### close()
+
+```ts
+close(): Promise<void>;
+```
+
+Closes the client: stops event streaming and flushes OpenTelemetry traces. Same as `await using`.
+
+**Returns**:
+
+- `Promise<void>`
+
 #### create()
 
 ##### Call Signature
