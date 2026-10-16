@@ -3,7 +3,7 @@
 
 # pylint: disable=protected-access
 
-"""The deprecated SDK 1.x async root client. Imports only the async v1 client chain."""
+# The SDK 1.x async root client. Imports only the async v1 client chain (no sync modules).
 
 from __future__ import annotations
 
