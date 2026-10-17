@@ -29,7 +29,7 @@ import (
 //	// Use with snapshot creation
 //	snapshot, logChan, err := client.V1().Snapshot.Create(ctx, &types.CreateSnapshotParams{
 //	    Name:  "my-python-env",
-//	    DockerImage: image,
+//	    Image: image,
 //	})
 type DockerImage struct {
 	instructions []string

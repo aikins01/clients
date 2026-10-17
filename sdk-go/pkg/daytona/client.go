@@ -318,14 +318,7 @@ func NewClientWithConfig(config *types.DaytonaConfig) (*Client, error) {
 		client.eventDispatcher.EnsureConnected()
 	}
 
-	client.v1 = &V1Client{
-		client:   client,
-		Otel:     client.Otel,
-		Volume:   volumeService,
-		Snapshot: snapshotService,
-		Secret:   secretService,
-		WarmPool: warmPoolService,
-	}
+	client.v1 = newV1Client(client)
 
 	return client, nil
 }
