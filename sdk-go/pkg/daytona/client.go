@@ -764,20 +764,7 @@ func (c *Client) doGet(ctx context.Context, sandboxIDOrName string) (*Sandbox, e
 	return NewSandbox(c, toolboxClient, sandboxResp, language, c.subscriptionManager), nil
 }
 
-// List returns an iterator over Sandboxes matching the given query, following
-// the [database/sql.Rows] / [bufio.Scanner] iterator pattern.
-//
-// For Go 1.23+ range-over-func consumers, see [Client.ListSeq].
-//
-// Example:
-//
-//	iter := client.List(ctx, &ListSandboxesQuery{Labels: map[string]string{"env": "dev"}})
-//	for iter.Next() {
-//	    fmt.Println(iter.Value().ID)
-//	}
-//	if err := iter.Err(); err != nil {
-//	    log.Fatal(err)
-//	}
+// list implements [V1Client.List].
 func (c *Client) list(ctx context.Context, query *ListSandboxesQuery) *SandboxIterator {
 	return &SandboxIterator{
 		client: c,
@@ -786,18 +773,7 @@ func (c *Client) list(ctx context.Context, query *ListSandboxesQuery) *SandboxIt
 	}
 }
 
-// ListSeq returns a Go 1.23+ range-over-func iterator over Sandboxes matching
-// the given query. Each yielded pair is (sandbox, error); a non-nil error
-// terminates iteration and the consumer should break out of the range.
-//
-// Example:
-//
-//	for sandbox, err := range client.ListSeq(ctx, &ListSandboxesQuery{...}) {
-//	    if err != nil {
-//	        log.Fatal(err)
-//	    }
-//	    fmt.Println(sandbox.ID)
-//	}
+// listSeq implements [V1Client.ListSeq].
 func (c *Client) listSeq(ctx context.Context, query *ListSandboxesQuery) iter.Seq2[*Sandbox, error] {
 	return func(yield func(*Sandbox, error) bool) {
 		it := c.list(ctx, query)

@@ -184,7 +184,7 @@ func (c *V1Client) ListSeq(ctx context.Context, query *ListSandboxesQuery) iter.
 // List returns an iterator over Sandboxes matching the given query, following
 // the [database/sql.Rows] / [bufio.Scanner] iterator pattern.
 //
-// For Go 1.23+ range-over-func consumers, see [Client.ListSeq].
+// For Go 1.23+ range-over-func consumers, see [V1Client.ListSeq].
 //
 // Example:
 //

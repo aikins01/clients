@@ -96,7 +96,7 @@ Daytona provides [examples](https://www.daytona.io/docs/en/getting-started/#exam
 
 ### Create a sandbox or snapshot in a specific region
 
-Set `target` on the sandbox create params, or pass `regionId` to `snapshot().create(...)`, to choose the [region](https://www.daytona.io/docs/en/regions/) for that call. The region is resolved per call: the per-call value, then the deprecated client-level `target` (or `DAYTONA_TARGET`), then the organization's default region.
+Set `target` on the sandbox create params, or pass `regionId` to `daytona.v1().snapshot().create(...)`, to choose the [region](https://www.daytona.io/docs/en/regions/) for that call. The region is resolved per call: the per-call value, then the deprecated client-level `target` (or `DAYTONA_TARGET`, which logs a one-time deprecation warning), then the organization's default region.
 
 ```java
 import io.daytona.sdk.Daytona;

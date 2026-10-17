@@ -678,7 +678,7 @@ func (c *Client) List(ctx context.Context, query *ListSandboxesQuery) *SandboxIt
 
 List returns an iterator over Sandboxes matching the given query, following the [database/sql.Rows](<https://pkg.go.dev/database/sql/#Rows>) / [bufio.Scanner](<https://pkg.go.dev/bufio/#Scanner>) iterator pattern.
 
-For Go 1.23\+ range\-over\-func consumers, see [Client.ListSeq](<#Client.ListSeq>).
+For Go 1.23\+ range\-over\-func consumers, see [V1Client.ListSeq](<#V1Client.ListSeq>).
 
 Example:
 
