@@ -93,7 +93,7 @@ module Daytona
     # @param value [String, nil]
     # @return [String, nil] the assigned value
     def target=(value)
-      Sdk::Deprecation.warn_target_once if value
+      Sdk::Deprecation.warn_target_once unless value.to_s.empty?
       @target = value
     end
 
@@ -170,7 +170,7 @@ module Daytona
 
     def resolve_target(target)
       resolved_target = target || @env_reader.call('DAYTONA_TARGET')
-      Sdk::Deprecation.warn_target_once if resolved_target
+      Sdk::Deprecation.warn_target_once unless resolved_target.to_s.empty?
       resolved_target
     end
 

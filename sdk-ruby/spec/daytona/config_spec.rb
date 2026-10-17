@@ -74,6 +74,22 @@ RSpec.describe Daytona::Config do
       expect(stderr).to match(/region_id:/)
     end
 
+    it 'does not warn for an empty target or DAYTONA_TARGET', :deprecation_warning do
+      ENV['DAYTONA_TARGET'] = ''
+
+      original = $stderr
+      $stderr = StringIO.new
+      begin
+        described_class.new(api_key: 'k')
+        described_class.new(api_key: 'k', target: '')
+        stderr = $stderr.string
+      ensure
+        $stderr = original
+      end
+
+      expect(stderr).not_to include('DAYTONA_TARGET) is deprecated')
+    end
+
     it 'warns once when target is assigned after construction', :deprecation_warning do
       config = described_class.new(api_key: 'k')
 

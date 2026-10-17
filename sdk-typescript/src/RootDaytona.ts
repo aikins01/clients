@@ -130,12 +130,12 @@ export class Daytona implements AsyncDisposable {
   }
 
   /**
-   * @deprecated Use `daytona.v1._experimental_fork` instead. The root form is removed in SDK 2.x.
+   * @deprecated Use `daytona.v1.fork` instead. The root form is removed in SDK 2.x.
    */
   public _experimental_fork(
     ...args: Parameters<DaytonaV1['_experimental_fork']>
   ): ReturnType<DaytonaV1['_experimental_fork']> {
-    warnRootNamespaceDeprecation('_experimental_fork')
+    warnRootNamespaceDeprecation('_experimental_fork', 'daytona.v1.fork')
     return this.client._experimental_fork(...args)
   }
 
