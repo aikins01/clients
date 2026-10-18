@@ -5,6 +5,8 @@ import * as fs from 'fs'
 import * as path from 'path'
 import type { DaytonaConfig, ListSandboxesQuery, Resources, VolumeMount } from '../index'
 import type { DaytonaConfigV1, ListSandboxesQueryV1, ResourcesV1, VolumeMountV1 } from '../v1'
+import type { Daytona as DaytonaImplType } from '../Daytona'
+import type { Daytona as RootDaytonaType } from '../RootDaytona'
 
 // Type-level: the V1 type aliases are the same types as the root ones (fails to compile otherwise).
 type Same<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false
@@ -14,6 +16,38 @@ const typeAliasesMatch: [
   Same<ResourcesV1, Resources>,
   Same<VolumeMountV1, VolumeMount>,
 ] = [true, true, true, true]
+
+// Type-level: every hand-written root forwarder has exactly the v1 parameters and return type.
+type Args<T> = T extends (...args: infer P) => unknown ? P : never
+type Result<T> = T extends (...args: never[]) => infer R ? R : never
+type SameMember<K extends keyof DaytonaImplType & keyof RootDaytonaType> =
+  Same<Args<RootDaytonaType[K]>, Args<DaytonaImplType[K]>> extends true
+    ? Same<Result<RootDaytonaType[K]>, Result<DaytonaImplType[K]>>
+    : false
+const forwarderSignaturesMatch: {
+  create: SameMember<'create'>
+  get: SameMember<'get'>
+  list: SameMember<'list'>
+  start: SameMember<'start'>
+  stop: SameMember<'stop'>
+  fork: SameMember<'fork'>
+  _experimental_fork: SameMember<'_experimental_fork'>
+  delete: SameMember<'delete'>
+  createAxiosInstance: Same<
+    Parameters<typeof RootDaytonaType.createAxiosInstance>,
+    Parameters<typeof DaytonaImplType.createAxiosInstance>
+  >
+} = {
+  create: true,
+  get: true,
+  list: true,
+  start: true,
+  stop: true,
+  fork: true,
+  _experimental_fork: true,
+  delete: true,
+  createAxiosInstance: true,
+}
 
 const createMock = jest.fn(async () => 'created')
 const getMock = jest.fn(async (sandboxId: string) => sandboxId)
@@ -102,6 +136,7 @@ describe('@daytona/sdk/v1 namespace', () => {
     expect(v1.SandboxV1).toBe(v1.Sandbox)
     expect(v1.SandboxStateV1).toBe(v1.SandboxState)
     expect(typeAliasesMatch).toEqual([true, true, true, true])
+    expect(Object.values(forwarderSignaturesMatch).every(Boolean)).toBe(true)
     expect(root.V1_API_URL).toBe(V1_API_URL)
     expect(v1.V1_API_URL).toBe(V1_API_URL)
 
