@@ -39,6 +39,7 @@ RSpec.describe Daytona::Daytona do
       expect(Daytona::V1::ValidationErrorV1).to be(Daytona::ValidationError)
       expect(Daytona::V1::AuthorizationErrorV1).to be(Daytona::AuthorizationError)
       expect(Daytona::V1::V1_API_URL).to eq(Daytona::V1_API_URL)
+      expect { Daytona::V1::NoSuchThing }.to raise_error(NameError, /Daytona::V1::NoSuchThing/)
     end
   end
 

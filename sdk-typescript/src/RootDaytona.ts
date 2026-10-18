@@ -181,6 +181,7 @@ export class Daytona implements AsyncDisposable {
   }
 
   /**
+   * @hidden
    * @deprecated Use `Daytona.createAxiosInstance` from `@daytona/sdk/v1` instead. The root form is removed in SDK 2.x.
    */
   public static createAxiosInstance(requestTimeoutMs?: number): AxiosInstance {

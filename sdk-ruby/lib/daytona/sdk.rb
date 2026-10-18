@@ -63,8 +63,9 @@ module Daytona
 
   module V1
     def self.const_missing(name)
-      const = ::Daytona.const_get(name, false)
-      const_set(name, const)
+      return super unless ::Daytona.const_defined?(name, false)
+
+      const_set(name, ::Daytona.const_get(name, false))
     end
 
     DaytonaV1 = Daytona
