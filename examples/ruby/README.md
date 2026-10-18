@@ -16,10 +16,9 @@ This directory contains example scripts demonstrating how to use the Daytona Rub
    # OR
    DAYTONA_JWT_TOKEN=your-jwt-token
    DAYTONA_ORGANIZATION_ID=your-org-id  # required when using JWT token
-
-   # Optional
-   DAYTONA_TARGET=us  # defaults to your organization's default region
    ```
+
+   To choose a region, pass `target:` in the sandbox create params or `region_id:` in the snapshot create params.
 
    The SDK automatically loads only Daytona-specific variables from `.env` and `.env.local` files in the current working directory, where `.env.local` overrides `.env`. Runtime environment variables always take precedence over `.env` files.
 
@@ -30,7 +29,6 @@ This directory contains example scripts demonstrating how to use the Daytona Rub
    ```bash
    export DAYTONA_API_KEY="your-api-key"
    export DAYTONA_API_URL="https://app.daytona.io/api"  # optional, this is the default
-   export DAYTONA_TARGET="us"  # optional
    ```
 
 2. **Ruby** - Ensure Ruby is installed (the Nix dev shell `nix develop .#ruby` includes Ruby 3.4.5)
