@@ -51,6 +51,8 @@ error). The 2.x root client's `.v1` always uses
 ## Versioned namespace
 
 Use the `v1` namespace for 2.x-compatible code today. Root resource methods are deprecated in 1.x and removed in 2.x.
+In 2.x the package root also exports only `Daytona`, `DaytonaConfig`, `V1_API_URL` and the shared errors; import resource
+types (`Sandbox`, `Image`, `CreateSandbox*Params`, …) from `@daytona/sdk/v1`.
 
 ```typescript
 import { Daytona } from '@daytona/sdk'

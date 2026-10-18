@@ -44,7 +44,9 @@ deprecated `target`, `connection_pool_maxsize` and `otel_enabled` to the root `D
 ## Versioned namespace
 
 Use `daytona.v1` directly, or access the client through `Daytona().v1` / `AsyncDaytona().v1`.
-The root resource methods are deprecated in 1.x and removed in 2.x.
+The root resource methods are deprecated in 1.x and removed in 2.x. In 2.x the package root also
+exports only the clients, `DaytonaConfig`, `V1_API_URL` and the shared errors; import resource types
+(`Sandbox`, `Image`, `CreateSandbox*Params`, …) from `daytona.v1`.
 
 ## Create a sandbox
 

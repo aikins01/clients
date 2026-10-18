@@ -131,12 +131,12 @@ Creates the root client and its v1 client from `config` (or the environment).
 #### ~~createAxiosInstance()~~
 
 ```ts
-static createAxiosInstance(...args: [number]): AxiosInstance;
+static createAxiosInstance(requestTimeoutMs?: number): AxiosInstance;
 ```
 
 **Parameters**:
 
-- `args` _...\[number\]_
+- `requestTimeoutMs?` _number_
 
 
 **Returns**:
@@ -150,12 +150,18 @@ Use `Daytona.createAxiosInstance` from `@daytona/sdk/v1` instead. The root form 
 #### ~~\_experimental\_fork()~~
 
 ```ts
-_experimental_fork(...args: [Sandbox, ForkSandboxParams, number]): Promise<Sandbox>;
+_experimental_fork(
+   sandbox: Sandbox, 
+   params?: ForkSandboxParams, 
+   timeout?: number
+): Promise<Sandbox>;
 ```
 
 **Parameters**:
 
-- `args` _...\[Sandbox, ForkSandboxParams, number\]_
+- `sandbox` _Sandbox_
+- `params?` _ForkSandboxParams_
+- `timeout?` _number = 60_
 
 
 **Returns**:
@@ -245,12 +251,18 @@ Use `daytona.v1.create` instead. The root form is removed in SDK 2.x.
 #### ~~delete()~~
 
 ```ts
-delete(...args: [Sandbox, number, boolean]): Promise<void>;
+delete(
+   sandbox: Sandbox, 
+   timeout?: number, 
+   wait?: boolean
+): Promise<void>;
 ```
 
 **Parameters**:
 
-- `args` _...\[Sandbox, number, boolean\]_
+- `sandbox` _Sandbox_
+- `timeout?` _number = 60_
+- `wait?` _boolean = false_
 
 
 **Returns**:
@@ -264,12 +276,18 @@ Use `daytona.v1.delete` instead. The root form is removed in SDK 2.x.
 #### ~~fork()~~
 
 ```ts
-fork(...args: [Sandbox, ForkSandboxParams, number]): Promise<Sandbox>;
+fork(
+   sandbox: Sandbox, 
+   params?: ForkSandboxParams, 
+   timeout?: number
+): Promise<Sandbox>;
 ```
 
 **Parameters**:
 
-- `args` _...\[Sandbox, ForkSandboxParams, number\]_
+- `sandbox` _Sandbox_
+- `params?` _ForkSandboxParams_
+- `timeout?` _number = 60_
 
 
 **Returns**:
@@ -283,12 +301,12 @@ Use `daytona.v1.fork` instead. The root form is removed in SDK 2.x.
 #### ~~get()~~
 
 ```ts
-get(...args: [string]): Promise<Sandbox>;
+get(sandboxIdOrName: string): Promise<Sandbox>;
 ```
 
 **Parameters**:
 
-- `args` _...\[string\]_
+- `sandboxIdOrName` _string_
 
 
 **Returns**:
@@ -302,12 +320,12 @@ Use `daytona.v1.get` instead. The root form is removed in SDK 2.x.
 #### ~~list()~~
 
 ```ts
-list(...args: [ListSandboxesQuery]): AsyncIterableIterator<Sandbox>;
+list(query?: ListSandboxesQuery): AsyncIterableIterator<Sandbox>;
 ```
 
 **Parameters**:
 
-- `args` _...\[ListSandboxesQuery\]_
+- `query?` _ListSandboxesQuery_
 
 
 ##### Returns
@@ -321,12 +339,13 @@ Use `daytona.v1.list` instead. The root form is removed in SDK 2.x.
 #### ~~start()~~
 
 ```ts
-start(...args: [Sandbox, number]): Promise<void>;
+start(sandbox: Sandbox, timeout?: number): Promise<void>;
 ```
 
 **Parameters**:
 
-- `args` _...\[Sandbox, number\]_
+- `sandbox` _Sandbox_
+- `timeout?` _number_
 
 
 **Returns**:
@@ -340,12 +359,12 @@ Use `daytona.v1.start` instead. The root form is removed in SDK 2.x.
 #### ~~stop()~~
 
 ```ts
-stop(...args: [Sandbox]): Promise<void>;
+stop(sandbox: Sandbox): Promise<void>;
 ```
 
 **Parameters**:
 
-- `args` _...\[Sandbox\]_
+- `sandbox` _Sandbox_
 
 
 **Returns**:
