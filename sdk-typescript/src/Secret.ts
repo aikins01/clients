@@ -114,7 +114,7 @@ export class SecretService {
    * cursor for the next page
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * let cursor: string | undefined = undefined;
    * do {
    *   const { items, total, nextCursor } = await daytona.secret.list({ cursor, limit: 50 });
@@ -148,7 +148,7 @@ export class SecretService {
    * @throws {DaytonaNotFoundError} If the Secret does not exist
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const secret = await daytona.secret.get("secret-id");
    * console.log(`Secret ${secret.name} can be used on ${secret.hosts.join(', ')}`);
    */
@@ -166,7 +166,7 @@ export class SecretService {
    * @throws {DaytonaConflictError} If a Secret with the same name already exists in the organization
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const secret = await daytona.secret.create({
    *   name: "anthropic-prod",
    *   value: "sk-ant-...",
@@ -194,7 +194,7 @@ export class SecretService {
    * @throws {DaytonaNotFoundError} If the Secret does not exist
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const secret = await daytona.secret.update("secret-id", {
    *   value: "sk-ant-new-value",
    *   hosts: ["api.anthropic.com", "*.anthropic.com"],
@@ -218,7 +218,7 @@ export class SecretService {
    * @throws {DaytonaNotFoundError} If the Secret does not exist
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * await daytona.secret.delete("secret-id");
    * console.log("Secret deleted successfully");
    */

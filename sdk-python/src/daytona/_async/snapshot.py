@@ -61,7 +61,8 @@ class AsyncSnapshotService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 page = await daytona.snapshot.list(page=2, limit=10)
                 print(f"Page {page.page} of {page.total_pages} ({page.total} snapshots total)")
                 for snapshot in page.items:
@@ -94,7 +95,8 @@ class AsyncSnapshotService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 await daytona.snapshot.delete("test-snapshot")
                 print("Snapshot deleted")
             ```
@@ -114,7 +116,8 @@ class AsyncSnapshotService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 snapshot = await daytona.snapshot.get("test-snapshot-name")
                 print(f"{snapshot.name} ({snapshot.image_name})")
             ```

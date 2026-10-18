@@ -47,7 +47,7 @@ export class WarmPoolService {
    * @returns {Promise<WarmPool[]>} List of all Warm Pools
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const pools = await daytona.warmPool.list();
    * pools.forEach(pool => console.log(`${pool.snapshot}: ${pool.currentSize}/${pool.pool} ready`));
    */
@@ -65,7 +65,7 @@ export class WarmPoolService {
    * @throws {DaytonaConflictError} If a Warm Pool for the same snapshot and region already exists
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const pool = await daytona.warmPool.create({ snapshot: 'my-snapshot', pool: 5 });
    * console.log(`Created warm pool ${pool.id} in ${pool.target}`);
    */
@@ -84,7 +84,7 @@ export class WarmPoolService {
    * @throws {DaytonaNotFoundError} If the Warm Pool does not exist
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const pool = await daytona.warmPool.update("warm-pool-id", { pool: 10 });
    */
   @WithInstrumentation()
@@ -101,7 +101,7 @@ export class WarmPoolService {
    * @throws {DaytonaNotFoundError} If the Warm Pool does not exist
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * await daytona.warmPool.delete("warm-pool-id");
    */
   @WithInstrumentation()

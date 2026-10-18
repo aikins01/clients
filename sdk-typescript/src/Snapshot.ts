@@ -110,7 +110,7 @@ export class SnapshotService {
    * @returns {Promise<PaginatedSnapshots>} Paginated list of Snapshots
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const { items, total, page: currentPage, totalPages } = await daytona.snapshot.list({ page: 2, limit: 10 });
    * console.log(`Page ${currentPage} of ${totalPages} (${total} snapshots total)`);
    * items.forEach(snapshot => console.log(`${snapshot.name} (${snapshot.imageName})`));
@@ -152,7 +152,7 @@ export class SnapshotService {
    * @throws {Error} If the Snapshot does not exist or cannot be accessed
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const snapshot = await daytona.snapshot.get("snapshot-name");
    * console.log(`Snapshot ${snapshot.name} is in state ${snapshot.state}`);
    */
@@ -170,7 +170,7 @@ export class SnapshotService {
    * @throws {Error} If the Snapshot does not exist or cannot be deleted
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * await daytona.snapshot.delete("snapshot-name");
    * console.log("Snapshot deleted successfully");
    */

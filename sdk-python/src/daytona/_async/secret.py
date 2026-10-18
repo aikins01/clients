@@ -49,7 +49,8 @@ class AsyncSecretService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 cursor = None
                 while True:
                     page = await daytona.secret.list(cursor=cursor, limit=50)
@@ -88,7 +89,8 @@ class AsyncSecretService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 secret = await daytona.secret.get("secret-id")
                 print(f"{secret.name} can be used on {', '.join(secret.hosts)}")
             ```
@@ -110,7 +112,8 @@ class AsyncSecretService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 secret = await daytona.secret.create(
                     CreateSecretParams(
                         name="anthropic-prod",
@@ -148,7 +151,8 @@ class AsyncSecretService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 secret = await daytona.secret.update(
                     "secret-id",
                     UpdateSecretParams(
@@ -181,7 +185,8 @@ class AsyncSecretService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 await daytona.secret.delete("secret-id")
                 print("Secret deleted")
             ```

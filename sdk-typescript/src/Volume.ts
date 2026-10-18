@@ -41,7 +41,7 @@ export class VolumeService {
    * @returns {Promise<Volume[]>} List of all Volumes accessible to the user
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const volumes = await daytona.volume.list();
    * console.log(`Found ${volumes.length} volumes`);
    * volumes.forEach(vol => console.log(`${vol.name} (${vol.id})`));
@@ -60,7 +60,7 @@ export class VolumeService {
    * @throws {Error} If the Volume does not exist or cannot be accessed
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const volume = await daytona.volume.get("volume-name", true);
    * console.log(`Volume ${volume.name} is in state ${volume.state}`);
    */
@@ -85,7 +85,7 @@ export class VolumeService {
    * @throws {Error} If the Volume cannot be created
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const volume = await daytona.volume.create("my-data-volume");
    * console.log(`Created volume ${volume.name} with ID ${volume.id}`);
    */
@@ -103,7 +103,7 @@ export class VolumeService {
    * @throws {Error} If the Volume does not exist or cannot be deleted
    *
    * @example
-   * const daytona = new Daytona();
+   * const daytona = new Daytona().v1;
    * const volume = await daytona.volume.get("volume-name");
    * await daytona.volume.delete(volume);
    * console.log("Volume deleted successfully");

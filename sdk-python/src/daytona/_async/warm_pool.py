@@ -24,7 +24,8 @@ class AsyncWarmPoolService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 pools = await daytona.warm_pool.list()
                 for pool in pools:
                     print(f"{pool.snapshot}: {pool.current_size}/{pool.pool} ready")
@@ -50,7 +51,8 @@ class AsyncWarmPoolService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 pool = await daytona.warm_pool.create("my-snapshot", pool=5)
                 print(f"Created warm pool {pool.id} in {pool.target}")
             ```
@@ -75,7 +77,8 @@ class AsyncWarmPoolService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 pool = await daytona.warm_pool.update("warm-pool-id", pool=10)
             ```
         """
@@ -93,7 +96,8 @@ class AsyncWarmPoolService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 await daytona.warm_pool.delete("warm-pool-id")
                 print("Warm pool deleted")
             ```

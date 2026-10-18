@@ -49,7 +49,7 @@ class SecretService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             cursor = None
             while True:
                 page = daytona.secret.list(cursor=cursor, limit=50)
@@ -88,7 +88,7 @@ class SecretService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             secret = daytona.secret.get("secret-id")
             print(f"{secret.name} can be used on {', '.join(secret.hosts)}")
             ```
@@ -110,7 +110,7 @@ class SecretService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             secret = daytona.secret.create(
                 CreateSecretParams(
                     name="anthropic-prod",
@@ -148,7 +148,7 @@ class SecretService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             secret = daytona.secret.update(
                 "secret-id",
                 UpdateSecretParams(
@@ -181,7 +181,7 @@ class SecretService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             daytona.secret.delete("secret-id")
             print("Secret deleted")
             ```

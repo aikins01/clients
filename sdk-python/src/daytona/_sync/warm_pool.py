@@ -24,7 +24,7 @@ class WarmPoolService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             pools = daytona.warm_pool.list()
             for pool in pools:
                 print(f"{pool.snapshot}: {pool.current_size}/{pool.pool} ready")
@@ -50,7 +50,7 @@ class WarmPoolService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             pool = daytona.warm_pool.create("my-snapshot", pool=5)
             print(f"Created warm pool {pool.id} in {pool.target}")
             ```
@@ -75,7 +75,7 @@ class WarmPoolService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             pool = daytona.warm_pool.update("warm-pool-id", pool=10)
             ```
         """
@@ -93,7 +93,7 @@ class WarmPoolService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             daytona.warm_pool.delete("warm-pool-id")
             print("Warm pool deleted")
             ```

@@ -26,7 +26,8 @@ class AsyncVolumeService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 volumes = await daytona.volume.list()
                 for volume in volumes:
                     print(f"{volume.name} ({volume.id})")
@@ -51,7 +52,8 @@ class AsyncVolumeService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 volume = await daytona.volume.get("test-volume-name", create=True)
                 print(f"{volume.name} ({volume.id})")
             ```
@@ -76,7 +78,8 @@ class AsyncVolumeService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 volume = await daytona.volume.create("test-volume")
                 print(f"{volume.name} ({volume.id}); state: {volume.state}")
             ```
@@ -93,7 +96,8 @@ class AsyncVolumeService:
 
         Example:
             ```python
-            async with AsyncDaytona() as daytona:
+            async with AsyncDaytona() as root:
+                daytona = root.v1
                 volume = await daytona.volume.get("test-volume")
                 await daytona.volume.delete(volume)
                 print("Volume deleted")

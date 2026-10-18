@@ -26,7 +26,7 @@ class VolumeService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             volumes = daytona.volume.list()
             for volume in volumes:
                 print(f"{volume.name} ({volume.id})")
@@ -51,7 +51,7 @@ class VolumeService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             volume = daytona.volume.get("test-volume-name", create=True)
             print(f"{volume.name} ({volume.id})")
             ```
@@ -76,7 +76,7 @@ class VolumeService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             volume = daytona.volume.create("test-volume")
             print(f"{volume.name} ({volume.id}); state: {volume.state}")
             ```
@@ -93,7 +93,7 @@ class VolumeService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             volume = daytona.volume.get("test-volume")
             daytona.volume.delete(volume)
             print("Volume deleted")

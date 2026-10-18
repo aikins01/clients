@@ -54,7 +54,7 @@ class SnapshotService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             page = daytona.snapshot.list(page=2, limit=10)
             print(f"Page {page.page} of {page.total_pages} ({page.total} snapshots total)")
             for snapshot in page.items:
@@ -85,7 +85,7 @@ class SnapshotService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             daytona.snapshot.delete("test-snapshot")
             print("Snapshot deleted")
             ```
@@ -105,7 +105,7 @@ class SnapshotService:
 
         Example:
             ```python
-            daytona = Daytona()
+            daytona = Daytona().v1
             snapshot = daytona.snapshot.get("test-snapshot-name")
             print(f"{snapshot.name} ({snapshot.image_name})")
             ```
