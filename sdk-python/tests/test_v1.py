@@ -3,12 +3,13 @@
 
 from __future__ import annotations
 
+import asyncio
 import inspect
 import os
 import subprocess
 import sys
 import warnings
-from collections.abc import Iterator
+from collections.abc import Awaitable, Callable, Iterator
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -321,6 +322,74 @@ def test_root_service_setters_forward_to_v1(root_cls: type, v1_patch_module: str
     for name, value in replacements.items():
         assert getattr(v1_client, name) is value
     assert len([w for w in caught if issubclass(w.category, DeprecationWarning)]) == 1
+
+
+def _deprecated_root_uses(client: object) -> list[tuple[str, Callable[[], object]]]:
+    """One callable per deprecated root member: properties (read and write) and every method."""
+    uses: list[tuple[str, Callable[[], object]]] = []
+    for name in sorted(vars(type(client))):
+        if name.startswith("_") or name in {"v1", "close"}:
+            continue
+        member = inspect.getattr_static(client, name)
+        if isinstance(member, property):
+            uses.append((name, lambda n=name: getattr(client, n)))
+            if member.fset is not None:
+                uses.append((name, lambda n=name: setattr(client, n, MagicMock())))
+        elif inspect.isfunction(member):
+            required = [
+                param
+                for param in list(inspect.signature(member).parameters.values())[1:]
+                if param.default is inspect.Parameter.empty
+                and param.kind in (param.POSITIONAL_ONLY, param.POSITIONAL_OR_KEYWORD)
+            ]
+            uses.append((name, lambda n=name, k=len(required): getattr(client, n)(*[MagicMock()] * k)))
+    return uses
+
+
+@pytest.mark.parametrize(
+    ("root_cls", "v1_patch_module", "v1_patch_target", "v1_mock_cls"),
+    [
+        (daytona.Daytona, "_root_sync", "_DaytonaV1", MagicMock),
+        (daytona.AsyncDaytona, "_root_async", "_AsyncDaytonaV1", AsyncMock),
+    ],
+)
+def test_every_deprecated_root_member_warns_on_its_own(
+    root_cls: type, v1_patch_module: str, v1_patch_target: str, v1_mock_cls: type
+):
+    with patch(f"daytona.{v1_patch_module}.{v1_patch_target}", return_value=v1_mock_cls()):
+        client = root_cls(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
+
+    uses = _deprecated_root_uses(client)
+    assert {name for name, _ in uses} >= {
+        "create",
+        "get",
+        "list",
+        "start",
+        "stop",
+        "delete",
+        "volume",
+        "default_language",
+    }
+    for name, use in uses:
+        _reset_deprecation_warnings_for_tests()
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            result = use()
+            if inspect.isawaitable(result):
+                asyncio.run(_await(result))
+        deprecations = [w for w in caught if issubclass(w.category, DeprecationWarning)]
+        assert len(deprecations) == 1, name
+        assert f"daytona.v1.{name}" in str(deprecations[0].message), name
+
+    _reset_deprecation_warnings_for_tests()
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        _ = client.v1
+    assert [w for w in caught if issubclass(w.category, DeprecationWarning)] == []
+
+
+async def _await(awaitable: Awaitable[object]) -> object:
+    return await awaitable
 
 
 @pytest.mark.parametrize(

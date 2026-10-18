@@ -14,6 +14,8 @@ import {
 import type { ListSandboxesQuery, Sandbox } from './Sandbox'
 import { warnRootNamespaceDeprecation } from './deprecation'
 
+type Writable<T> = { -readonly [K in keyof T]: T[K] }
+
 /**
  * The SDK 1.x root client.
  *
@@ -58,10 +60,26 @@ export class Daytona implements AsyncDisposable {
     return this.client.volume
   }
 
+  /** @deprecated Use `daytona.v1.volume` instead. The root form is removed in SDK 2.x. */
+  public set volume(value: DaytonaV1['volume']) {
+    warnRootNamespaceDeprecation('volume')
+    // 0.x exposed this as a plain field (readonly only in TypeScript), so JS callers and test
+    // doubles could replace it; keep that working by writing through to the v1 client.
+    ;(this.client as Writable<DaytonaV1>).volume = value
+  }
+
   /** @deprecated Use `daytona.v1.snapshot` instead. The root form is removed in SDK 2.x. */
   public get snapshot(): DaytonaV1['snapshot'] {
     warnRootNamespaceDeprecation('snapshot')
     return this.client.snapshot
+  }
+
+  /** @deprecated Use `daytona.v1.snapshot` instead. The root form is removed in SDK 2.x. */
+  public set snapshot(value: DaytonaV1['snapshot']) {
+    warnRootNamespaceDeprecation('snapshot')
+    // 0.x exposed this as a plain field (readonly only in TypeScript), so JS callers and test
+    // doubles could replace it; keep that working by writing through to the v1 client.
+    ;(this.client as Writable<DaytonaV1>).snapshot = value
   }
 
   /** @deprecated Use `daytona.v1.secret` instead. The root form is removed in SDK 2.x. */
@@ -70,10 +88,26 @@ export class Daytona implements AsyncDisposable {
     return this.client.secret
   }
 
+  /** @deprecated Use `daytona.v1.secret` instead. The root form is removed in SDK 2.x. */
+  public set secret(value: DaytonaV1['secret']) {
+    warnRootNamespaceDeprecation('secret')
+    // 0.x exposed this as a plain field (readonly only in TypeScript), so JS callers and test
+    // doubles could replace it; keep that working by writing through to the v1 client.
+    ;(this.client as Writable<DaytonaV1>).secret = value
+  }
+
   /** @deprecated Use `daytona.v1.warmPool` instead. The root form is removed in SDK 2.x. */
   public get warmPool(): DaytonaV1['warmPool'] {
     warnRootNamespaceDeprecation('warmPool')
     return this.client.warmPool
+  }
+
+  /** @deprecated Use `daytona.v1.warmPool` instead. The root form is removed in SDK 2.x. */
+  public set warmPool(value: DaytonaV1['warmPool']) {
+    warnRootNamespaceDeprecation('warmPool')
+    // 0.x exposed this as a plain field (readonly only in TypeScript), so JS callers and test
+    // doubles could replace it; keep that working by writing through to the v1 client.
+    ;(this.client as Writable<DaytonaV1>).warmPool = value
   }
 
   /**

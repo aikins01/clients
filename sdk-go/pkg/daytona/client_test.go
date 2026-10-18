@@ -1430,6 +1430,45 @@ func TestClientDeprecatedMethodsForwardToV1(t *testing.T) {
 	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
 }
 
+func TestEveryDeprecatedRootMethodWarnsOnItsOwn(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusInternalServerError)
+		_, _ = w.Write([]byte(`{"message":"boom"}`))
+	}))
+	defer server.Close()
+	client := createTestClientWithServer(t, server)
+	ctx := context.Background()
+
+	//nolint:staticcheck // exercises each deprecated root method on its own.
+	uses := map[string]func(){
+		"Create":  func() { _, _ = client.Create(ctx, nil, options.WithWaitForStart(false)) },
+		"Get":     func() { _, _ = client.Get(ctx, "sb") },
+		"List":    func() { _ = client.List(ctx, nil) },
+		"ListSeq": func() { _ = client.ListSeq(ctx, nil) },
+	}
+	rootType := reflect.TypeOf((*Client)(nil))
+	for idx := range rootType.NumMethod() {
+		name := rootType.Method(idx).Name
+		if name == "V1" || name == "Close" {
+			continue
+		}
+		_, covered := uses[name]
+		require.Truef(t, covered, "add Client.%s to this test", name)
+	}
+
+	for name, use := range uses {
+		resetDeprecationWarningsForTests()
+		var stderr bytes.Buffer
+		SetDeprecationWarningWriter(&stderr)
+		use()
+		warning := stderr.String()
+		assert.Equalf(t, 1, strings.Count(warning, "DeprecationWarning:"), "Client.%s", name)
+		assert.Containsf(t, warning, "daytona.Client."+name+" is deprecated", "Client.%s", name)
+	}
+	resetDeprecationWarningsForTests()
+}
+
 func TestTargetDeprecationWarnsOnceForConfig(t *testing.T) {
 	resetDeprecationWarningsForTests()
 	t.Cleanup(resetDeprecationWarningsForTests)

@@ -108,6 +108,28 @@ RSpec.describe Daytona::Daytona do
     end
   end
 
+  describe 'warning for every deprecated member on its own', :deprecation_warning do
+    it 'warns once per member, naming it, and never for v1 or close' do
+      members = described_class.public_instance_methods - Object.public_instance_methods - %i[v1 close]
+      expect(members).to include(:create, :get, :list, :start, :stop, :delete, :volume, :snapshot)
+
+      members.each do |name|
+        allow(client.v1).to receive(name).and_return(:result)
+        required = described_class.instance_method(name).parameters.count { |kind, _| kind == :req }
+        Daytona::Sdk::Deprecation.reset_for_tests!
+
+        stderr = capture_stderr { client.public_send(name, *Array.new(required, :arg)) }
+
+        expect(stderr.scan('root form is removed in SDK 2.x').size).to eq(1), name.to_s
+        expect(stderr).to include("Daytona::Daytona##{name}"), name.to_s
+      end
+
+      Daytona::Sdk::Deprecation.reset_for_tests!
+      allow(client.v1).to receive(:close)
+      expect(capture_stderr { client.v1 && client.close }).to eq('')
+    end
+  end
+
   describe 'forwarding of every deprecated method' do
     {
       create: [[:params], { on_snapshot_create_logs: :logs }],

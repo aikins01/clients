@@ -314,6 +314,74 @@ describe('@daytona/sdk/v1 namespace', () => {
     emitWarningSpy.mockRestore()
   })
 
+  it('warns on its own for every deprecated root member, naming it', async () => {
+    const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
+    const { Daytona } = await import('../index')
+    const { resetRootNamespaceDeprecationWarningForTests } = await import('../deprecation')
+    const sandbox = { id: 'sandbox-1' } as never
+    const root = new Daytona({ apiKey: 'api-key' })
+    expect(emitWarningSpy).not.toHaveBeenCalled()
+
+    const members: Array<[string, () => unknown]> = [
+      ['volume', () => root.volume],
+      ['snapshot', () => root.snapshot],
+      ['secret', () => root.secret],
+      ['warmPool', () => root.warmPool],
+      ['create', () => root.create()],
+      ['get', () => root.get('sandbox-1')],
+      ['list', () => root.list()],
+      ['start', () => root.start(sandbox)],
+      ['stop', () => root.stop(sandbox)],
+      ['fork', () => root.fork(sandbox)],
+      ['delete', () => root.delete(sandbox)],
+      ['daytona.v1.fork', () => root._experimental_fork(sandbox)],
+      ['createAxiosInstance', () => Daytona.createAxiosInstance()],
+    ]
+    for (const [name, use] of members) {
+      resetRootNamespaceDeprecationWarningForTests()
+      emitWarningSpy.mockClear()
+      await use()
+      expect(emitWarningSpy).toHaveBeenCalledTimes(1)
+      expect(emitWarningSpy).toHaveBeenCalledWith(
+        expect.stringContaining(name),
+        expect.objectContaining({ code: 'DAYTONA_ROOT_NAMESPACE' }),
+      )
+    }
+
+    resetRootNamespaceDeprecationWarningForTests()
+    emitWarningSpy.mockClear()
+    void root.v1
+    await root.close()
+    expect(emitWarningSpy).not.toHaveBeenCalled()
+
+    emitWarningSpy.mockRestore()
+  })
+
+  it('forwards deprecated root service assignments to the v1 client', async () => {
+    const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
+    const { Daytona } = await import('../index')
+    const root = new Daytona({ apiKey: 'api-key' })
+    const replacements = {
+      volume: { kind: 'other-volume' },
+      snapshot: { kind: 'other-snapshot' },
+      secret: { kind: 'other-secret' },
+      warmPool: { kind: 'other-warm-pool' },
+    }
+
+    root.volume = replacements.volume as never
+    root.snapshot = replacements.snapshot as never
+    root.secret = replacements.secret as never
+    root.warmPool = replacements.warmPool as never
+
+    expect(root.v1.volume).toBe(replacements.volume)
+    expect(root.v1.snapshot).toBe(replacements.snapshot)
+    expect(root.v1.secret).toBe(replacements.secret)
+    expect(root.v1.warmPool).toBe(replacements.warmPool)
+    expect(emitWarningSpy).toHaveBeenCalledTimes(1)
+
+    emitWarningSpy.mockRestore()
+  })
+
   it('forwards static members to the implementation class', async () => {
     const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
     const { Daytona } = await import('../index')

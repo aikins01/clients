@@ -12,6 +12,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -105,6 +106,52 @@ class DaytonaWrapperTest {
         Mockito.verify(delegate).secret();
         Mockito.verify(delegate).warmPool();
         Mockito.verifyNoMoreInteractions(delegate);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Test
+    void everyDeprecatedRootMemberWarnsOnItsOwn() {
+        DaytonaV1 delegate = Mockito.mock(DaytonaV1.class);
+        Daytona daytona = new Daytona(delegate);
+        io.daytona.sdk.model.CreateSandboxFromSnapshotParams snapshotParams =
+                new io.daytona.sdk.model.CreateSandboxFromSnapshotParams();
+        io.daytona.sdk.model.CreateSandboxFromImageParams imageParams =
+                new io.daytona.sdk.model.CreateSandboxFromImageParams();
+        io.daytona.sdk.model.ListSandboxesQuery query = new io.daytona.sdk.model.ListSandboxesQuery();
+
+        java.util.Map<String, Runnable> uses = new java.util.LinkedHashMap<String, Runnable>();
+        uses.put("create()", () -> daytona.create());
+        uses.put("create(CreateSandboxFromSnapshotParams)", () -> daytona.create(snapshotParams));
+        uses.put("create(CreateSandboxFromImageParams)", () -> daytona.create(imageParams));
+        uses.put("create(CreateSandboxFromSnapshotParams, long)", () -> daytona.create(snapshotParams, 1L));
+        uses.put("create(CreateSandboxFromImageParams, long)", () -> daytona.create(imageParams, 1L));
+        uses.put("create(CreateSandboxFromImageParams, long, Consumer)", () -> daytona.create(imageParams, 1L, line -> { }));
+        uses.put("get(String)", () -> daytona.get("sandbox-1"));
+        uses.put("list()", () -> daytona.list());
+        uses.put("list(ListSandboxesQuery)", () -> daytona.list(query));
+        uses.put("listStream()", () -> daytona.listStream());
+        uses.put("listStream(ListSandboxesQuery)", () -> daytona.listStream(query));
+        uses.put("snapshot()", () -> daytona.snapshot());
+        uses.put("volume()", () -> daytona.volume());
+        uses.put("secret()", () -> daytona.secret());
+        uses.put("warmPool()", () -> daytona.warmPool());
+
+        long deprecatedPublicMethods = Arrays.stream(Daytona.class.getDeclaredMethods())
+                .filter(method -> Modifier.isPublic(method.getModifiers()))
+                .filter(method -> method.isAnnotationPresent(Deprecated.class))
+                .count();
+        assertThat(uses).hasSize((int) deprecatedPublicMethods);
+
+        for (Map.Entry<String, Runnable> use : uses.entrySet()) {
+            TestSupport.withLogCapture(Logger.getLogger(Daytona.class.getName()), records -> {
+                Daytona.resetRootNamespaceWarningForTests();
+                use.getValue().run();
+                assertThat(records).as(use.getKey()).hasSize(1);
+                String member = use.getKey().substring(0, use.getKey().indexOf('('));
+                assertThat(records.get(0).getMessage()).as(use.getKey()).contains("Daytona." + member);
+            });
+        }
+        Daytona.resetRootNamespaceWarningForTests();
     }
 
     @Test
