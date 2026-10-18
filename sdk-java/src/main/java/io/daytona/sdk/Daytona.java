@@ -320,8 +320,8 @@ public class Daytona implements AutoCloseable {
 
     private static void warnRootNamespaceUsage(String member, String replacement) {
         if (ROOT_NAMESPACE_WARNING_EMITTED.compareAndSet(false, true)) {
-            LOG.warning("Daytona." + member + " is deprecated. Use Daytona." + replacement
-                    + " or DaytonaV1 instead. The root form is removed in SDK 2.x.");
+            LOG.warning("Daytona." + member + " is deprecated. Use daytona." + replacement
+                    + " (or DaytonaV1) instead. The root form is removed in SDK 2.x.");
         }
     }
 }
