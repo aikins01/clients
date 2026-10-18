@@ -284,6 +284,36 @@ describe('@daytona/sdk/v1 namespace', () => {
     emitWarningSpy.mockRestore()
   })
 
+  it('shares warn-once state between separate copies of the module', () => {
+    const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
+    type Deprecation = typeof import('../deprecation')
+    const load = (): Deprecation => {
+      let loaded: Deprecation | undefined
+      jest.isolateModules(() => {
+        loaded = jest.requireActual<Deprecation>('../deprecation')
+      })
+      if (!loaded) throw new Error('deprecation module did not load')
+      return loaded
+    }
+    const first = load()
+    const second = load()
+    expect(second).not.toBe(first)
+    first.resetRootNamespaceDeprecationWarningForTests()
+    first.resetTargetDeprecationWarningForTests()
+
+    first.warnRootNamespaceDeprecation('create')
+    second.warnRootNamespaceDeprecation('get')
+    first.warnTargetDeprecation()
+    second.warnTargetDeprecation()
+
+    const codes = emitWarningSpy.mock.calls.map((call) => (call[1] as { code?: string } | undefined)?.code)
+    expect(codes).toEqual(['DAYTONA_ROOT_NAMESPACE', 'DAYTONA_CONFIG_TARGET'])
+
+    first.resetRootNamespaceDeprecationWarningForTests()
+    first.resetTargetDeprecationWarningForTests()
+    emitWarningSpy.mockRestore()
+  })
+
   it('forwards static members to the implementation class', async () => {
     const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
     const { Daytona } = await import('../index')
