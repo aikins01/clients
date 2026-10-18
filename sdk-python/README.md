@@ -38,14 +38,14 @@ To keep code portable to SDK 2.x, pass only `api_key`, `jwt_token`, `organizatio
 deprecated `target`, `connection_pool_maxsize` and `otel_enabled` to the root `DaytonaConfig`. The
 2.x root `DaytonaConfig` has no `api_url`, `server_url`, `use_deprecated_polling` or `_experimental`
 (passing one raises `TypeError`). The 2.x root client's
-`.v1` always uses `V1_API_URL` and does not read `DAYTONA_API_URL`. If you need a custom endpoint, build the v1 client directly with
+`.v1` uses `V1_API_URL` and does not read `DAYTONA_API_URL`. If you need a custom endpoint, build the v1 client directly with
 `from daytona.v1 import Daytona, DaytonaConfig`.
 
 ## Versioned namespace
 
 Use `daytona.v1` directly, or access the client through `Daytona().v1` / `AsyncDaytona().v1`.
 The root resource methods are deprecated in 1.x and removed in 2.x. In 2.x the package root also
-exports only the clients, `DaytonaConfig`, `V1_API_URL` and the shared errors; import resource types
+exports only the clients, `DaytonaConfig`, `V1_API_URL`, `DEFAULT_V2_API_URL` and the shared errors; import resource types
 (`Sandbox`, `Image`, `CreateSandbox*Params`, …) from `daytona.v1`.
 
 ## Create a sandbox

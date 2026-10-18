@@ -44,14 +44,14 @@ const daytona = new Daytona({
 To keep code portable to SDK 2.x, pass only `apiKey`, `jwtToken`, `organizationId`, the deprecated
 `target` and `otelEnabled` to the root `Daytona`. The 2.x root `DaytonaConfig` has no `apiUrl`,
 `serverUrl`, `useDeprecatedPolling`, `requestTimeoutMs` or `_experimental` (passing one is a type
-error). The 2.x root client's `.v1` always uses
+error). The 2.x root client's `.v1` uses
 `V1_API_URL` and does not read `DAYTONA_API_URL`. If you need a custom endpoint, create the v1 client directly with `Daytona` from
 `@daytona/sdk/v1`.
 
 ## Versioned namespace
 
 Use the `v1` namespace for 2.x-compatible code today. Root resource methods are deprecated in 1.x and removed in 2.x.
-In 2.x the package root also exports only `Daytona`, `DaytonaConfig`, `V1_API_URL` and the shared errors; import resource
+In 2.x the package root also exports only `Daytona`, `DaytonaConfig`, `V1_API_URL`, `DEFAULT_V2_API_URL` and the shared errors; import resource
 types (`Sandbox`, `Image`, `CreateSandbox*Params`, …) from `@daytona/sdk/v1`.
 
 ```typescript
