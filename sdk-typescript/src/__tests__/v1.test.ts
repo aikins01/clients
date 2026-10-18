@@ -322,28 +322,41 @@ describe('@daytona/sdk/v1 namespace', () => {
     const root = new Daytona({ apiKey: 'api-key' })
     expect(emitWarningSpy).not.toHaveBeenCalled()
 
-    const members: Array<[string, () => unknown]> = [
-      ['volume', () => root.volume],
-      ['snapshot', () => root.snapshot],
-      ['secret', () => root.secret],
-      ['warmPool', () => root.warmPool],
-      ['create', () => root.create()],
-      ['get', () => root.get('sandbox-1')],
-      ['list', () => root.list()],
-      ['start', () => root.start(sandbox)],
-      ['stop', () => root.stop(sandbox)],
-      ['fork', () => root.fork(sandbox)],
-      ['delete', () => root.delete(sandbox)],
-      ['daytona.v1.fork', () => root._experimental_fork(sandbox)],
-      ['createAxiosInstance', () => Daytona.createAxiosInstance()],
+    // [member, text the warning must contain, use]
+    const members: Array<[string, string, () => unknown]> = [
+      ['volume', 'volume', () => root.volume],
+      ['volume', 'volume', () => (root.volume = {} as never)],
+      ['snapshot', 'snapshot', () => root.snapshot],
+      ['snapshot', 'snapshot', () => (root.snapshot = {} as never)],
+      ['secret', 'secret', () => root.secret],
+      ['secret', 'secret', () => (root.secret = {} as never)],
+      ['warmPool', 'warmPool', () => root.warmPool],
+      ['warmPool', 'warmPool', () => (root.warmPool = {} as never)],
+      ['create', 'create', () => root.create()],
+      ['get', 'get', () => root.get('sandbox-1')],
+      ['list', 'list', () => root.list()],
+      ['start', 'start', () => root.start(sandbox)],
+      ['stop', 'stop', () => root.stop(sandbox)],
+      ['fork', 'fork', () => root.fork(sandbox)],
+      ['delete', 'delete', () => root.delete(sandbox)],
+      ['_experimental_fork', 'daytona.v1.fork', () => root._experimental_fork(sandbox)],
+      ['createAxiosInstance', 'createAxiosInstance', () => Daytona.createAxiosInstance()],
     ]
-    for (const [name, use] of members) {
+    const covered = new Set(members.map(([member]) => member))
+    const instanceMembers = Object.getOwnPropertyNames(Daytona.prototype).filter(
+      (name) => !['constructor', 'v1', 'close'].includes(name),
+    )
+    const staticMembers = Object.getOwnPropertyNames(Daytona).filter(
+      (name) => !['length', 'name', 'prototype'].includes(name),
+    )
+    expect([...instanceMembers, ...staticMembers].filter((name) => !covered.has(name))).toEqual([])
+    for (const [, text, use] of members) {
       resetRootNamespaceDeprecationWarningForTests()
       emitWarningSpy.mockClear()
       await use()
       expect(emitWarningSpy).toHaveBeenCalledTimes(1)
       expect(emitWarningSpy).toHaveBeenCalledWith(
-        expect.stringContaining(name),
+        expect.stringContaining(text),
         expect.objectContaining({ code: 'DAYTONA_ROOT_NAMESPACE' }),
       )
     }
