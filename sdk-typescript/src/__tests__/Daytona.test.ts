@@ -172,6 +172,8 @@ describe('Daytona', () => {
   beforeEach(() => {
     jest.resetModules()
     jest.clearAllMocks()
+    // The warn-once state lives on globalThis (shared by ESM and CJS builds), so module resets keep it.
+    delete (globalThis as Record<symbol, unknown>)[Symbol.for('@daytona/sdk/deprecation-warnings')]
     emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
 
     delete process.env.DAYTONA_API_KEY

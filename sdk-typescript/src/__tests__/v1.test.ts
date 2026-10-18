@@ -24,6 +24,17 @@ type SameMember<K extends keyof DaytonaImplType & keyof RootDaytonaType> =
   Same<Args<RootDaytonaType[K]>, Args<DaytonaImplType[K]>> extends true
     ? Same<Result<RootDaytonaType[K]>, Result<DaytonaImplType[K]>>
     : false
+// Overloaded create: compare both overloads' parameter tuples and results (infer alone sees only the last).
+type OverloadArgs2<T> = T extends {
+  (...args: infer A1): infer R1
+  (...args: infer A2): infer R2
+}
+  ? [A1, R1, A2, R2]
+  : never
+const createOverloadsMatch: Same<
+  OverloadArgs2<RootDaytonaType['create']>,
+  OverloadArgs2<DaytonaImplType['create']>
+> = true
 const forwarderSignaturesMatch: {
   create: SameMember<'create'>
   get: SameMember<'get'>
@@ -137,6 +148,7 @@ describe('@daytona/sdk/v1 namespace', () => {
     expect(v1.SandboxStateV1).toBe(v1.SandboxState)
     expect(typeAliasesMatch).toEqual([true, true, true, true])
     expect(Object.values(forwarderSignaturesMatch).every(Boolean)).toBe(true)
+    expect(createOverloadsMatch).toBe(true)
     expect(root.V1_API_URL).toBe(V1_API_URL)
     expect(v1.V1_API_URL).toBe(V1_API_URL)
 

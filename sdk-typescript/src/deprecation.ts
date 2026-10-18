@@ -6,8 +6,15 @@
 const ROOT_NAMESPACE_WARNING_CODE = 'DAYTONA_ROOT_NAMESPACE'
 const TARGET_WARNING_CODE = 'DAYTONA_CONFIG_TARGET'
 
-let didWarnRootNamespace = false
-let didWarnTargetConfig = false
+// Shared through globalThis so the ESM and CJS builds (both can load in one process) warn once in total.
+type WarningState = { rootNamespace: boolean; targetConfig: boolean }
+const STATE_KEY = Symbol.for('@daytona/sdk/deprecation-warnings')
+
+function warningState(): WarningState {
+  const holder = globalThis as typeof globalThis & { [STATE_KEY]?: WarningState }
+  holder[STATE_KEY] ??= { rootNamespace: false, targetConfig: false }
+  return holder[STATE_KEY]
+}
 
 function emitDeprecationWarning(message: string, code: string): void {
   const nodeProcess = typeof process === 'undefined' ? undefined : process
@@ -23,11 +30,12 @@ function emitDeprecationWarning(message: string, code: string): void {
 }
 
 export function warnRootNamespaceDeprecation(member: string, replacement = `daytona.v1.${member}`): void {
-  if (didWarnRootNamespace) {
+  const state = warningState()
+  if (state.rootNamespace) {
     return
   }
 
-  didWarnRootNamespace = true
+  state.rootNamespace = true
   emitDeprecationWarning(
     `Use \`${replacement}\` instead. The root form is removed in SDK 2.x.`,
     ROOT_NAMESPACE_WARNING_CODE,
@@ -35,11 +43,12 @@ export function warnRootNamespaceDeprecation(member: string, replacement = `dayt
 }
 
 export function warnTargetDeprecation(): void {
-  if (didWarnTargetConfig) {
+  const state = warningState()
+  if (state.targetConfig) {
     return
   }
 
-  didWarnTargetConfig = true
+  state.targetConfig = true
   emitDeprecationWarning(
     'DaytonaConfig.target (and DAYTONA_TARGET) is deprecated and will be removed in a future version. Pass target per sandbox create call or regionId per snapshot create call instead.',
     TARGET_WARNING_CODE,
@@ -47,9 +56,9 @@ export function warnTargetDeprecation(): void {
 }
 
 export function resetRootNamespaceDeprecationWarningForTests(): void {
-  didWarnRootNamespace = false
+  warningState().rootNamespace = false
 }
 
 export function resetTargetDeprecationWarningForTests(): void {
-  didWarnTargetConfig = false
+  warningState().targetConfig = false
 }
