@@ -2,16 +2,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { Buffer } from 'buffer'
-import { Daytona, Image } from '@daytona/sdk'
+import { Daytona } from '@daytona/sdk'
+import { Daytona as DaytonaV1, Image } from '@daytona/sdk/v1'
 
 const result: Record<string, unknown> = {
   imageOk: false,
+  v1ClassOk: false,
   daytonaConstructorOk: false,
   fsThrowsOk: false,
   bufferOk: false,
   listOk: false,
   downloadFileOk: false,
 }
+
+result.v1ClassOk = DaytonaV1 !== Daytona && typeof DaytonaV1 === 'function'
 
 try {
   const image = Image.base('alpine').env({ FOO: 'bar' })
@@ -56,7 +60,7 @@ if (apiKey && apiUrl) {
   const daytona = new Daytona({ apiKey, apiUrl })
 
   try {
-    const iter = daytona.list()
+    const iter = daytona.v1.list()
     if (typeof (iter as any)[Symbol.asyncIterator] !== 'function') {
       throw new Error('list() did not return an async iterator')
     }
@@ -71,7 +75,7 @@ if (apiKey && apiUrl) {
   // processDownloadFilesResponseWithBuffered → toBuffer → getBufferCtor.
   if (sandboxId && fileContent) {
     try {
-      const sandbox = await daytona.get(sandboxId)
+      const sandbox = await daytona.v1.get(sandboxId)
       const buf = await sandbox.fs.downloadFile('test.txt')
       result.downloadFileOk = buf.toString('utf-8') === fileContent
     } catch (e: unknown) {

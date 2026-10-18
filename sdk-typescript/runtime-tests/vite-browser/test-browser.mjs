@@ -64,7 +64,9 @@ async function runBrowserTest(sandboxId) {
     if (p === '/') p = '/index.html'
     const fp = resolve(join(DIST, p))
     if (!fp.startsWith(DIST + '/') && fp !== DIST) {
-      res.writeHead(403); res.end(); return
+      res.writeHead(403)
+      res.end()
+      return
     }
     if (existsSync(fp)) {
       if (extname(fp) === '.html') {
@@ -76,20 +78,30 @@ async function runBrowserTest(sandboxId) {
         res.end(readFileSync(fp))
       }
     } else {
-      res.writeHead(404); res.end()
+      res.writeHead(404)
+      res.end()
     }
   })
 
   await new Promise((r) => server.listen(0, r))
   const PORT = server.address().port
-  const closeServer = () => { try { server.close() } catch { /* noop */ } }
+  const closeServer = () => {
+    try {
+      server.close()
+    } catch {
+      /* noop */
+    }
+  }
 
   const browser = await chromium.launch({ headless: true })
   try {
     const page = await browser.newPage()
     const errors = []
     const allConsole = []
-    page.on('pageerror', (e) => { errors.push('pageerror: ' + e.message); allConsole.push(`[pageerror] ${e.message}`) })
+    page.on('pageerror', (e) => {
+      errors.push('pageerror: ' + e.message)
+      allConsole.push(`[pageerror] ${e.message}`)
+    })
     page.on('console', (msg) => {
       allConsole.push(`[${msg.type()}] ${msg.text()}`)
       if (msg.type() === 'error') errors.push('console.error: ' + msg.text())
@@ -112,16 +124,20 @@ async function runBrowserTest(sandboxId) {
 
     const checks = [
       ['imageOk', 'Image API broken'],
+      ['v1ClassOk', '@daytona/sdk/v1 Daytona is missing or is the root client'],
       ['daytonaConstructorOk', 'Daytona constructor broken'],
       ['fsThrowsOk', 'fs methods did not throw clear error'],
       ['bufferOk', 'globalThis.Buffer polyfill not available or broken'],
-      ['listOk', 'daytona.list() failed in browser'],
+      ['listOk', 'daytona.v1.list() failed in browser'],
       ['downloadFileOk', 'FileSystem.downloadFile Buffer handling broken in browser (Binary.ts regression)'],
     ]
 
     let code = 0
     for (const [key, msg] of checks) {
-      if (!result[key]) { console.error(`FAIL: ${msg}`); code = 1 }
+      if (!result[key]) {
+        console.error(`FAIL: ${msg}`)
+        code = 1
+      }
     }
     if (code === 0) console.log('PASS')
     return code
