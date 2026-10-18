@@ -220,6 +220,23 @@ describe('@daytona/sdk/v1 namespace', () => {
     dispose.mockRestore()
   })
 
+  it('points the root _experimental_fork warning at daytona.v1.fork', async () => {
+    const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
+    const { Daytona } = await import('../index')
+    const { resetRootNamespaceDeprecationWarningForTests } = await import('../deprecation')
+    resetRootNamespaceDeprecationWarningForTests()
+
+    await new Daytona({ apiKey: 'api-key' })._experimental_fork({ id: 'sandbox-1' } as never)
+
+    expect(emitWarningSpy).toHaveBeenCalledTimes(1)
+    expect(emitWarningSpy).toHaveBeenCalledWith(
+      expect.stringContaining('daytona.v1.fork'),
+      expect.objectContaining({ code: 'DAYTONA_ROOT_NAMESPACE' }),
+    )
+
+    emitWarningSpy.mockRestore()
+  })
+
   it('forwards static members to the implementation class', async () => {
     const emitWarningSpy = jest.spyOn(process, 'emitWarning').mockImplementation(() => undefined)
     const { Daytona } = await import('../index')

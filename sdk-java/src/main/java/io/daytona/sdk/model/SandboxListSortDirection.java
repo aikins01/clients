@@ -4,7 +4,7 @@
 package io.daytona.sdk.model;
 
 /**
- * Sort direction for {@link io.daytona.sdk.Daytona#list}.
+ * Sort direction for {@link io.daytona.sdk.DaytonaV1#list}.
  *
  * <p>This is the SDK-facing mirror of the api-client enum. It exists so users
  * never need to import from the api-client package.

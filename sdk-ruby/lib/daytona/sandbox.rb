@@ -214,8 +214,8 @@ module Daytona
     # @return [Daytona::CodeInterpreter]
     attr_reader :code_interpreter
 
-    # Internal — obtain sandboxes via Daytona::Daytona#create, Daytona::Daytona#get,
-    # or Daytona::Daytona#list rather than constructing directly.
+    # Internal — obtain sandboxes via Daytona::V1::Daytona#create, Daytona::V1::Daytona#get,
+    # or Daytona::V1::Daytona#list rather than constructing directly.
     #
     # @params config [Daytona::Config]
     # @params sandbox_api [DaytonaApiClient::SandboxApi]

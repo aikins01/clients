@@ -557,7 +557,7 @@ public void refreshData()
 ```
 
 Refreshes local Sandbox fields from latest API state. After refresh, all fields
-— including those not returned by `Daytona#list` — are populated.
+— including those not returned by `DaytonaV1#list` — are populated.
 
 **Throws**:
 
@@ -1079,7 +1079,7 @@ public Map<String, String> getEnv()
 
 Returns Sandbox environment variables.
 
-Not returned by `Daytona#list`; call `#refreshData()` on each item to populate.
+Not returned by `DaytonaV1#list`; call `#refreshData()` on each item to populate.
 
 **Returns**:
 
@@ -1092,7 +1092,7 @@ public Boolean getNetworkBlockAll()
 
 Returns whether all network access is blocked for this Sandbox.
 
-Not returned by `Daytona#list`; call `#refreshData()` on each item to populate.
+Not returned by `DaytonaV1#list`; call `#refreshData()` on each item to populate.
 
 **Returns**:
 
@@ -1105,7 +1105,7 @@ public Boolean getKvm()
 
 Whether the sandbox exposes KVM (/dev/kvm) to its guest.
 
-Not returned by `Daytona#list`; call `#refreshData()` on each item to populate.
+Not returned by `DaytonaV1#list`; call `#refreshData()` on each item to populate.
 
 **Returns**:
 
@@ -1118,7 +1118,7 @@ public String getNetworkAllowList()
 
 Returns the comma-separated CIDR allow list, if any.
 
-Not returned by `Daytona#list`; call `#refreshData()` on each item to populate.
+Not returned by `DaytonaV1#list`; call `#refreshData()` on each item to populate.
 
 **Returns**:
 
@@ -1131,7 +1131,7 @@ public String getDomainAllowList()
 
 Returns the comma-separated list of allowed domains, if any.
 
-Not returned by `Daytona#list`; call `#refreshData()` on each item to populate.
+Not returned by `DaytonaV1#list`; call `#refreshData()` on each item to populate.
 
 **Returns**:
 
@@ -1144,7 +1144,7 @@ public String getOutboundProxyUrl()
 
 Returns the outbound proxy URL to route the sandbox HTTP(S) traffic through, if any.
 
-Not returned by `Daytona#list`; call `#refreshData()` on each item to populate.
+Not returned by `DaytonaV1#list`; call `#refreshData()` on each item to populate.
 Applied via the HTTP(S)_PROXY environment variables; combine with domainAllowList for
 network-layer enforcement.
 
@@ -1159,7 +1159,7 @@ public List<SandboxVolume> getVolumes()
 
 Returns volumes attached to the Sandbox.
 
-Not returned by `Daytona#list`; call `#refreshData()` on each item to populate.
+Not returned by `DaytonaV1#list`; call `#refreshData()` on each item to populate.
 
 **Returns**:
 
@@ -1172,7 +1172,7 @@ public BuildInfo getBuildInfo()
 
 Returns build information if the Sandbox was created from a dynamic build.
 
-Not returned by `Daytona#list`; call `#refreshData()` on each item to populate.
+Not returned by `DaytonaV1#list`; call `#refreshData()` on each item to populate.
 
 **Returns**:
 
@@ -1185,7 +1185,7 @@ public String getBackupCreatedAt()
 
 Returns the creation timestamp of the last backup.
 
-Not returned by `Daytona#list`; call `#refreshData()` on each item to populate.
+Not returned by `DaytonaV1#list`; call `#refreshData()` on each item to populate.
 
 **Returns**:
 
@@ -1198,7 +1198,7 @@ public String getOtelEndpointOverride()
 
 Returns the OpenTelemetry collector endpoint override for this Sandbox.
 
-Not returned by `Daytona#list`; call `#refreshData()` on each item to populate.
+Not returned by `DaytonaV1#list`; call `#refreshData()` on each item to populate.
 
 **Returns**:
 

@@ -11,10 +11,10 @@ import apiclient "github.com/daytona/clients/api-client-go"
 // SandboxState represents the lifecycle state of a Sandbox.
 type SandboxState = apiclient.SandboxState
 
-// SandboxListSortField selects the field used to order results from [Client.List].
+// SandboxListSortField selects the field used to order results from [V1Client.List].
 type SandboxListSortField = apiclient.SandboxListSortField
 
-// SandboxListSortDirection selects ascending or descending order for [Client.List].
+// SandboxListSortDirection selects ascending or descending order for [V1Client.List].
 type SandboxListSortDirection = apiclient.SandboxListSortDirection
 
 // CamelCase enum constants, matching idiomatic Go naming (the underlying

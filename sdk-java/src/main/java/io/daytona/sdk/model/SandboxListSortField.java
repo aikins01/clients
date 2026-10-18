@@ -4,7 +4,7 @@
 package io.daytona.sdk.model;
 
 /**
- * Field used to order results from {@link io.daytona.sdk.Daytona#list}.
+ * Field used to order results from {@link io.daytona.sdk.DaytonaV1#list}.
  *
  * <p>This is the SDK-facing mirror of the api-client enum. It exists so users
  * never need to import from the api-client package.

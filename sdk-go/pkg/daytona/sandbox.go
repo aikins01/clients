@@ -115,45 +115,45 @@ type Sandbox struct {
 	QueueTimedOutAt *string // When the sandbox was destroyed after exceeding its queue timeout
 
 	// Env contains environment variables set in the sandbox.
-	// Not populated by [Client.List]; call [Sandbox.RefreshData] on each item to populate.
+	// Not populated by [V1Client.List]; call [Sandbox.RefreshData] on each item to populate.
 	Env map[string]string
 
 	// BackupCreatedAt is the timestamp of the last backup.
-	// Not populated by [Client.List]; call [Sandbox.RefreshData] on each item to populate.
+	// Not populated by [V1Client.List]; call [Sandbox.RefreshData] on each item to populate.
 	BackupCreatedAt *string
 
 	// Volumes attached to the sandbox.
-	// Not populated by [Client.List]; call [Sandbox.RefreshData] on each item to populate.
+	// Not populated by [V1Client.List]; call [Sandbox.RefreshData] on each item to populate.
 	Volumes []apiclient.SandboxVolume
 
 	// BuildInfo contains build information for the sandbox if it was created from a dynamic build.
-	// Not populated by [Client.List]; call [Sandbox.RefreshData] on each item to populate.
+	// Not populated by [V1Client.List]; call [Sandbox.RefreshData] on each item to populate.
 	BuildInfo *apiclient.BuildInfo
 
 	// NetworkBlockAll blocks all network access when true. Nil when not populated.
-	// Not populated by [Client.List]; call [Sandbox.RefreshData] on each item to populate.
+	// Not populated by [V1Client.List]; call [Sandbox.RefreshData] on each item to populate.
 	NetworkBlockAll *bool
 
 	// Kvm reports whether the sandbox exposes KVM (/dev/kvm) to its guest.
-	// Not populated by [Client.List]; call [Sandbox.RefreshData] on each item to populate.
+	// Not populated by [V1Client.List]; call [Sandbox.RefreshData] on each item to populate.
 	Kvm *bool
 
 	// NetworkAllowList is a comma-separated list of allowed CIDR addresses.
-	// Not populated by [Client.List]; call [Sandbox.RefreshData] on each item to populate.
+	// Not populated by [V1Client.List]; call [Sandbox.RefreshData] on each item to populate.
 	NetworkAllowList *string
 
 	// DomainAllowList is a comma-separated list of allowed domains.
-	// Not populated by [Client.List]; call [Sandbox.RefreshData] on each item to populate.
+	// Not populated by [V1Client.List]; call [Sandbox.RefreshData] on each item to populate.
 	DomainAllowList *string
 
 	// OutboundProxyUrl is the outbound proxy URL the sandbox HTTP(S) traffic is
 	// routed through. Applied via the HTTP(S)_PROXY environment variables;
 	// combine with DomainAllowList for network-layer enforcement.
-	// Not populated by [Client.List]; call [Sandbox.RefreshData] on each item to populate.
+	// Not populated by [V1Client.List]; call [Sandbox.RefreshData] on each item to populate.
 	OutboundProxyUrl *string
 
 	// OtelEndpointOverride is the OpenTelemetry collector endpoint override for the sandbox.
-	// Not populated by [Client.List]; call [Sandbox.RefreshData] on each item to populate.
+	// Not populated by [V1Client.List]; call [Sandbox.RefreshData] on each item to populate.
 	OtelEndpointOverride *string
 
 	FileSystem      *FileSystemService      // File system operations
@@ -279,10 +279,10 @@ type ListSandboxesQuery struct {
 	Order *apiclient.SandboxListSortDirection
 }
 
-// SandboxIterator iterates over Sandboxes returned by [Client.List], following
+// SandboxIterator iterates over Sandboxes returned by [V1Client.List], following
 // the standard Go iterator pattern used by [database/sql.Rows] and [bufio.Scanner].
 //
-// For Go 1.23+ range-over-func consumers, see [Client.ListSeq].
+// For Go 1.23+ range-over-func consumers, see [V1Client.ListSeq].
 type SandboxIterator struct {
 	client *Client
 	ctx    context.Context
@@ -365,11 +365,11 @@ func (it *SandboxIterator) Err() error {
 // dto may be either *[apiclient.Sandbox] (returned by single-sandbox endpoints
 // such as Create, Get, Fork, RefreshData) or *[apiclient.SandboxListItem]
 // (returned by the list endpoint). When dto is a *[apiclient.SandboxListItem],
-// the fields documented as "Not populated by [Client.List]" remain at their
+// the fields documented as "Not populated by [V1Client.List]" remain at their
 // zero values; call [Sandbox.RefreshData] to populate them.
 //
 // This is typically called internally by the SDK. Users should obtain sandboxes
-// via [Client.Create], [Client.Get], or [Client.List] rather than calling this
+// via [V1Client.Create], [V1Client.Get], or [V1Client.List] rather than calling this
 // directly.
 func NewSandbox(client *Client, toolboxClient *toolbox.APIClient, dto sandboxDTO, language types.CodeLanguage, subscriptionManager *common.EventSubscriptionManager) *Sandbox {
 	var otelSt *otelState
@@ -834,7 +834,7 @@ func containsSandboxState(states []apiclient.SandboxState, state apiclient.Sandb
 // RefreshData refreshes the sandbox data from the API.
 //
 // This updates all sandbox fields from the server, including those not
-// populated by [Client.List] (Env, NetworkBlockAll, NetworkAllowList, DomainAllowList,
+// populated by [V1Client.List] (Env, NetworkBlockAll, NetworkAllowList, DomainAllowList,
 // OutboundProxyUrl, Volumes, BuildInfo, BackupCreatedAt).
 //
 // Example:

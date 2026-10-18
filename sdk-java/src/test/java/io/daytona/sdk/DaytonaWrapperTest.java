@@ -53,7 +53,7 @@ class DaytonaWrapperTest {
             assertThat(daytona.snapshot()).isSameAs(snapshotService);
 
             assertThat(records).hasSize(1);
-            assertThat(records.get(0).getMessage()).contains("Daytona.create()").contains("v1().create()");
+            assertThat(records.get(0).getMessage()).contains("Daytona.create()").contains("daytona.v1().create()");
             Daytona.resetRootNamespaceWarningForTests();
         });
     }

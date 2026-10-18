@@ -986,7 +986,7 @@ err := sandbox.Git.Clone(ctx, url, path,
 func WithWaitForStart(waitForStart bool) func(*CreateSandbox)
 ```
 
-WithWaitForStart controls whether \[daytona.Client.Create\] waits for the sandbox to reach the started state before returning.
+WithWaitForStart controls whether \[daytona.V1Client.Create\] waits for the sandbox to reach the started state before returning.
 
 When true \(the default\), Create blocks until the sandbox is fully started and ready for use. When false, Create returns immediately after the sandbox is created, which may be in a pending or building state.
 
@@ -1038,7 +1038,7 @@ type CreatePty struct {
 <a name="CreateSandbox"></a>
 ## type CreateSandbox
 
-CreateSandbox holds optional parameters for \[daytona.Client.Create\].
+CreateSandbox holds optional parameters for \[daytona.V1Client.Create\].
 
 ```go
 type CreateSandbox struct {

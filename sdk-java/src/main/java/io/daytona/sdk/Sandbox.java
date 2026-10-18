@@ -862,7 +862,7 @@ public class Sandbox {
 
     /**
      * Refreshes local Sandbox fields from latest API state. After refresh, all fields
-     * — including those not returned by {@link Daytona#list} — are populated.
+     * — including those not returned by {@link DaytonaV1#list} — are populated.
      *
      * @throws DaytonaException if refresh fails
      */
@@ -1538,7 +1538,7 @@ public class Sandbox {
     /**
      * Returns Sandbox environment variables.
      *
-     * <p>Not returned by {@link Daytona#list}; call {@link #refreshData()} on each item to populate.
+     * <p>Not returned by {@link DaytonaV1#list}; call {@link #refreshData()} on each item to populate.
      *
      * @return environment map, or {@code null} if not yet populated
      */
@@ -1546,7 +1546,7 @@ public class Sandbox {
     /**
      * Returns whether all network access is blocked for this Sandbox.
      *
-     * <p>Not returned by {@link Daytona#list}; call {@link #refreshData()} on each item to populate.
+     * <p>Not returned by {@link DaytonaV1#list}; call {@link #refreshData()} on each item to populate.
      *
      * @return block-all flag, or {@code null} if not yet populated
      */
@@ -1554,7 +1554,7 @@ public class Sandbox {
     /**
      * Whether the sandbox exposes KVM (/dev/kvm) to its guest.
      *
-     * <p>Not returned by {@link Daytona#list}; call {@link #refreshData()} on each item to populate.
+     * <p>Not returned by {@link DaytonaV1#list}; call {@link #refreshData()} on each item to populate.
      *
      * @return KVM flag, or {@code null} if not yet populated
      */
@@ -1562,7 +1562,7 @@ public class Sandbox {
     /**
      * Returns the comma-separated CIDR allow list, if any.
      *
-     * <p>Not returned by {@link Daytona#list}; call {@link #refreshData()} on each item to populate.
+     * <p>Not returned by {@link DaytonaV1#list}; call {@link #refreshData()} on each item to populate.
      *
      * @return allow list, or {@code null}
      */
@@ -1570,7 +1570,7 @@ public class Sandbox {
     /**
      * Returns the comma-separated list of allowed domains, if any.
      *
-     * <p>Not returned by {@link Daytona#list}; call {@link #refreshData()} on each item to populate.
+     * <p>Not returned by {@link DaytonaV1#list}; call {@link #refreshData()} on each item to populate.
      *
      * @return allowed domains, or {@code null}
      */
@@ -1578,7 +1578,7 @@ public class Sandbox {
     /**
      * Returns the outbound proxy URL to route the sandbox HTTP(S) traffic through, if any.
      *
-     * <p>Not returned by {@link Daytona#list}; call {@link #refreshData()} on each item to populate.
+     * <p>Not returned by {@link DaytonaV1#list}; call {@link #refreshData()} on each item to populate.
      * Applied via the HTTP(S)_PROXY environment variables; combine with domainAllowList for
      * network-layer enforcement.
      *
@@ -1588,7 +1588,7 @@ public class Sandbox {
     /**
      * Returns volumes attached to the Sandbox.
      *
-     * <p>Not returned by {@link Daytona#list}; call {@link #refreshData()} on each item to populate.
+     * <p>Not returned by {@link DaytonaV1#list}; call {@link #refreshData()} on each item to populate.
      *
      * @return immutable list of attached volumes, or {@code null} if not yet populated
      */
@@ -1596,7 +1596,7 @@ public class Sandbox {
     /**
      * Returns build information if the Sandbox was created from a dynamic build.
      *
-     * <p>Not returned by {@link Daytona#list}; call {@link #refreshData()} on each item to populate.
+     * <p>Not returned by {@link DaytonaV1#list}; call {@link #refreshData()} on each item to populate.
      *
      * @return build info, or {@code null}
      */
@@ -1604,7 +1604,7 @@ public class Sandbox {
     /**
      * Returns the creation timestamp of the last backup.
      *
-     * <p>Not returned by {@link Daytona#list}; call {@link #refreshData()} on each item to populate.
+     * <p>Not returned by {@link DaytonaV1#list}; call {@link #refreshData()} on each item to populate.
      *
      * @return backup timestamp, or {@code null}
      */
@@ -1612,7 +1612,7 @@ public class Sandbox {
     /**
      * Returns the OpenTelemetry collector endpoint override for this Sandbox.
      *
-     * <p>Not returned by {@link Daytona#list}; call {@link #refreshData()} on each item to populate.
+     * <p>Not returned by {@link DaytonaV1#list}; call {@link #refreshData()} on each item to populate.
      *
      * @return OTel endpoint URL, or {@code null}
      */
