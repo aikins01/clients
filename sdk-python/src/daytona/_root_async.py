@@ -7,9 +7,9 @@
 
 from __future__ import annotations
 
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Awaitable
 from types import TracebackType
-from typing import Callable, overload
+from typing import Callable, cast, overload
 
 from typing_extensions import deprecated
 
@@ -156,8 +156,8 @@ class AsyncDaytona:
     ) -> AsyncSandbox:
         warn_root_namespace_once("create")
         # Forward exactly what the implementation accepts (snapshot or image params, and the log callback
-        # with either); its public overloads cannot express that union, so call it untyped.
-        create = getattr(self.v1, "create")
+        # with either); its public overloads cannot express that union, so call it through a typed cast.
+        create = cast(Callable[..., Awaitable[AsyncSandbox]], self.v1.create)
         return await create(params, timeout=timeout, on_snapshot_create_logs=on_snapshot_create_logs)
 
     @deprecated("Use `daytona.v1.delete` instead. The root form is removed in SDK 2.x.", category=None)
