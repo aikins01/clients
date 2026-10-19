@@ -56,9 +56,15 @@ def warn_root_namespace_once(member_name: str) -> None:
     with _lock:
         if _root_namespace_warning_emitted:
             return
-        # Mark as emitted only once warn() returns: with warnings turned into errors, every call raises.
-        warnings.warn(root_namespace_message(member_name), DeprecationWarning, stacklevel=user_stacklevel())
         _root_namespace_warning_emitted = True
+    # Warn outside the lock (handlers may call back into the SDK); if a filter turns the warning
+    # into an error, re-arm so the next call raises too.
+    try:
+        warnings.warn(root_namespace_message(member_name), DeprecationWarning, stacklevel=user_stacklevel())
+    except BaseException:
+        with _lock:
+            _root_namespace_warning_emitted = False
+        raise
 
 
 def warn_target_deprecation_once() -> None:
@@ -67,8 +73,13 @@ def warn_target_deprecation_once() -> None:
     with _lock:
         if _target_warning_emitted:
             return
-        warnings.warn(TARGET_DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=user_stacklevel())
         _target_warning_emitted = True
+    try:
+        warnings.warn(TARGET_DEPRECATION_MESSAGE, DeprecationWarning, stacklevel=user_stacklevel())
+    except BaseException:
+        with _lock:
+            _target_warning_emitted = False
+        raise
 
 
 def _reset_deprecation_warnings_for_tests() -> None:

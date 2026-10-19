@@ -37,11 +37,12 @@ func warnDeprecatedTargetUsage() {
 }
 
 func writeDeprecationWarning(message string) {
+	// Held during the write so the root and target warnings never write concurrently, even to a
+	// writer that is not safe for concurrent use.
 	deprecationWarningWriterMu.Lock()
-	writer := deprecationWarningWriter
-	deprecationWarningWriterMu.Unlock()
+	defer deprecationWarningWriterMu.Unlock()
 
-	_, _ = fmt.Fprintln(writer, message)
+	_, _ = fmt.Fprintln(deprecationWarningWriter, message)
 }
 
 // SetDeprecationWarningWriter sets where the SDK writes its one-time deprecation warnings

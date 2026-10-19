@@ -3,7 +3,8 @@
 
 # pylint: disable=protected-access
 
-# The SDK 1.x sync root client. Imports only the sync v1 client chain (no async modules).
+# The SDK 1.x sync root client, built on the sync v1 client (daytona._sync); it does not import
+# daytona._async.
 
 from __future__ import annotations
 

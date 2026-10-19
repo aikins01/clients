@@ -66,10 +66,15 @@ emits one `DeprecationWarning`.
 **Example**:
 
 ```python
+import asyncio
+
 from daytona import AsyncDaytona
 
-async with AsyncDaytona() as daytona:
-    sandbox = await daytona.v1.create()
+async def main():
+    async with AsyncDaytona() as daytona:
+        sandbox = await daytona.v1.create()
+
+asyncio.run(main())
 ```
 
 #### AsyncDaytona.\_\_init\_\_

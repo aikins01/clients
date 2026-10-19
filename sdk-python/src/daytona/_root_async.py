@@ -3,7 +3,8 @@
 
 # pylint: disable=protected-access
 
-# The SDK 1.x async root client. Imports only the async v1 client chain (no sync modules).
+# The SDK 1.x async root client, built on the async v1 client (daytona._async); it does not import
+# daytona._sync.daytona.
 
 from __future__ import annotations
 
@@ -34,10 +35,15 @@ class AsyncDaytona:
 
     Example:
         ```python
+        import asyncio
+
         from daytona import AsyncDaytona
 
-        async with AsyncDaytona() as daytona:
-            sandbox = await daytona.v1.create()
+        async def main():
+            async with AsyncDaytona() as daytona:
+                sandbox = await daytona.v1.create()
+
+        asyncio.run(main())
         ```
     """
 
