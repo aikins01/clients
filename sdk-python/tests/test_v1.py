@@ -307,6 +307,23 @@ class TestRootAsyncDaytonaWrapper:
     ("root_cls", "v1_patch_module", "v1_patch_target"),
     [(daytona.Daytona, "_root_sync", "_DaytonaV1"), (daytona.AsyncDaytona, "_root_async", "_AsyncDaytonaV1")],
 )
+def test_root_warning_raises_on_every_call_when_turned_into_errors(
+    root_cls: type, v1_patch_module: str, v1_patch_target: str
+):
+    with patch(f"daytona.{v1_patch_module}.{v1_patch_target}", return_value=MagicMock()):
+        client = root_cls(DaytonaConfig(api_key="test-key", api_url="https://api.test.io"))
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error", DeprecationWarning)
+        for _ in range(2):
+            with pytest.raises(DeprecationWarning):
+                _ = client.volume
+
+
+@pytest.mark.parametrize(
+    ("root_cls", "v1_patch_module", "v1_patch_target"),
+    [(daytona.Daytona, "_root_sync", "_DaytonaV1"), (daytona.AsyncDaytona, "_root_async", "_AsyncDaytonaV1")],
+)
 def test_root_service_setters_forward_to_v1(root_cls: type, v1_patch_module: str, v1_patch_target: str):
     v1_client = MagicMock()
 
