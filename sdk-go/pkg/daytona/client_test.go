@@ -8,6 +8,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math"
 	"net/http"
 	"net/http/httptest"
@@ -1428,6 +1429,32 @@ func TestClientDeprecatedMethodsForwardToV1(t *testing.T) {
 	warning := stderr.String()
 	assert.Contains(t, warning, "daytona.Client.Create is deprecated")
 	assert.Equal(t, 1, strings.Count(warning, "DeprecationWarning:"))
+}
+
+type reconfiguringWriter struct{ bytes.Buffer }
+
+func (w *reconfiguringWriter) Write(p []byte) (int, error) {
+	SetDeprecationWarningWriter(io.Discard)
+	return w.Buffer.Write(p)
+}
+
+func TestDeprecationWarningWriterMayReconfigureWhileWriting(t *testing.T) {
+	resetDeprecationWarningsForTests()
+	t.Cleanup(resetDeprecationWarningsForTests)
+
+	writer := &reconfiguringWriter{}
+	SetDeprecationWarningWriter(writer)
+	done := make(chan struct{})
+	go func() {
+		warnDeprecatedRootMember("Create")
+		close(done)
+	}()
+	select {
+	case <-done:
+	case <-time.After(5 * time.Second):
+		t.Fatal("warning write deadlocked")
+	}
+	assert.Contains(t, writer.String(), "daytona.Client.Create is deprecated")
 }
 
 func TestEveryDeprecatedRootMethodWarnsOnItsOwn(t *testing.T) {
